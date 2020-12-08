@@ -1,0 +1,74 @@
+# Compiled class file
+*.class
+
+# Log file
+*.log
+logs/
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs
+hs_err_pid*
+
+# generated files
+bin/
+gen/
+ 
+# OS
+.DS_Store
+*/.DS_Store
+
+# Eclipse
+.settings
+/target/
+.classpath
+.project
+
+### STS ###
+.apt_generated
+.factorypath
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+/.idea
+/target
+/logs
+*.log
+**/*.iml
+*.iws
+*.iml
+*.ipr
+.gradle
+/build/
+.DS_Store
+Thumbs.db
+Servers
+.metadata
+upload
+gen_code
+.settings/
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
