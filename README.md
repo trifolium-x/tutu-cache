@@ -1,5 +1,5 @@
-tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的缓存注解项目。
-使用注解方式来代替@Cacheable和@CacheEvict等注解
+tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的SpringAop项目。
+使用tutu-cache注解来代替@Cacheable和@CacheEvict等注解
 ### 引入tutu-cache
 1. 在springBoot中的使用
     * 引入jar依赖包
@@ -80,7 +80,7 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的�
         }
       
         // 如果需要调用本地的方法
-        @TuCacheClear(keys={"test_service:itemList:","test_service:itemDetail:+#{#id}"}, sync = true)
+        @TuCacheClear(keys={"test_service:itemList:","test_service:itemDetail:#{#id}"}, sync = true)
         public void deleteItem(Long id){
         }
         ```
