@@ -1,6 +1,6 @@
 package co.tunan.tucache.starter.configure;
 
-import co.tunan.tucache.core.aspect.TuCacheAspect;
+import co.tunan.tucache.core.TuCacheBean;
 import co.tunan.tucache.core.cache.TuCacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConditionalOnMissingBean(TuCacheAspect.class)
+@ConditionalOnMissingBean(TuCacheBean.class)
 @EnableConfigurationProperties(TuCacheConfigure.class)
 public class TuCacheAutoConfigure {
 
@@ -23,9 +23,12 @@ public class TuCacheAutoConfigure {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnExpression("#tuCacheConfigure.enable")
-    public TuCacheAspect starterService() {
+    public TuCacheBean starterService() {
 
-        return null;
+        TuCacheBean tuCacheBean = new TuCacheBean(tuCacheService);
+        tuCacheBean.setTuCacheProfiles(tuCacheConfigure.getProfiles());
+
+        return tuCacheBean;
     }
 
 }

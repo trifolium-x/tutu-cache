@@ -32,7 +32,7 @@ public class TuCacheBean implements BeanFactoryPostProcessor, BeanFactoryAware, 
         this.tuCacheService = tuCacheService;
     }
 
-    public TuCacheBean(){
+    public TuCacheBean() {
 
     }
 
@@ -50,13 +50,7 @@ public class TuCacheBean implements BeanFactoryPostProcessor, BeanFactoryAware, 
         }
 
         if (tuCacheService == null) {
-            RedisCacheService redisCacheService = new RedisCacheService();
-            RedisTemplate redisTemplate = beanFactory.getBean(RedisTemplate.class);
-            if (redisTemplate == null) {
-                throw new IllegalStateException("set default redisCacheService failed，redisTemplate is not bean.");
-            }
-            redisCacheService.setRedisTemplate(redisTemplate);
-            tuCacheService = redisCacheService;
+            tuCacheService = defaultTuCacheService();
         }
     }
 
@@ -79,18 +73,24 @@ public class TuCacheBean implements BeanFactoryPostProcessor, BeanFactoryAware, 
     public void destroy() throws Exception {
 
         TuCacheAspect tuCacheAspect = beanFactory.getBean(TuCacheAspect.class);
-        if (tuCacheAspect != null) {
-            tuCacheAspect.threadPool.shutdown();
-        }
+        tuCacheAspect.threadPool.shutdown();
+
         log.info("TuCache is destroy");
     }
 
-    public void setTuCacheService(TuCacheService tuCacheService){
+    public void setTuCacheService(TuCacheService tuCacheService) {
 
         this.tuCacheService = tuCacheService;
     }
 
-    public void setTuCacheProfiles(TuCacheProfiles tuCacheProfiles){
+    public void setTuCacheProfiles(TuCacheProfiles tuCacheProfiles) {
         this.tuCacheProfiles = tuCacheProfiles;
+    }
+
+    private TuCacheService defaultTuCacheService() {
+        RedisCacheService redisCacheService = new RedisCacheService();
+        redisCacheService.setRedisTemplate(beanFactory.getBean(RedisTemplate.class));
+
+        return redisCacheService;
     }
 }
