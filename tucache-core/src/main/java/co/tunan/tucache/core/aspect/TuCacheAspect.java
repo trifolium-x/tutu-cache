@@ -4,6 +4,8 @@ import co.tunan.tucache.core.annotation.TuCache;
 import co.tunan.tucache.core.annotation.TuCacheClear;
 import co.tunan.tucache.core.cache.TuCacheService;
 import co.tunan.tucache.core.config.TuCacheProfiles;
+import co.tunan.tucache.core.util.SystemInfo;
+import co.tunan.tucache.core.util.TuCacheUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
@@ -11,20 +13,10 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.expression.BeanExpressionContextAccessor;
-import org.springframework.context.expression.BeanFactoryAccessor;
-import org.springframework.context.expression.MapAccessor;
-import org.springframework.context.expression.MethodBasedEvaluationContext;
-import org.springframework.core.DefaultParameterNameDiscoverer;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.ParserContext;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 /**
  * Created by wangxudong on 2020/04/09.
@@ -37,93 +29,104 @@ public class TuCacheAspect {
 
     private final static Logger log = LoggerFactory.getLogger(TuCacheAspect.class);
 
-
     /**
      * 可缓存的线程池，用于提交异步任务
      */
-    public static final ExecutorService threadPool = Executors.newCachedThreadPool();
+    private ExecutorService threadPool = null;
 
     private TuCacheService tuCacheService;
 
     private TuCacheProfiles tuCacheProfiles;
 
+    public TuCacheAspect() {
+
+        initThreadPool();
+    }
+
     @Around("@annotation(co.tunan.tucache.core.annotation.TuCache)")
     public Object cache(ProceedingJoinPoint pjp) throws Throwable {
         log.debug("tu-cache caching");
 
-        Object cacheResult;
-        Signature signature = pjp.getSignature();
-        MethodSignature methodSignature = (MethodSignature) signature;
-        Method targetMethod = methodSignature.getMethod();
-        TuCache tuCache = targetMethod.getAnnotation(TuCache.class);
-        if (tuCache == null) {
+        if (checkTuCacheService()) {
 
-            return pjp.proceed();
-        }
-        Method method = getMethod(pjp);
-        Object[] args = pjp.getArgs();
-        String key = StringUtils.isEmpty(tuCache.key()) ? tuCache.value() : tuCache.key();
+            Object targetObj = pjp.getTarget();
+            Signature signature = pjp.getSignature();
+            MethodSignature methodSignature = (MethodSignature) signature;
+            Method method = methodSignature.getMethod();
+            Class<?> returnType = method.getReturnType();
+            if (returnType.equals(void.class)) {
 
-        Object targetObj = pjp.getTarget();
-        String cacheKey = parseKey(key, targetObj, method, args);
-        Class<?> returnType = method.getReturnType();
-        if (returnType.equals(void.class)) {
-
-            return pjp.proceed();
-        }
-        try {
-            if (tuCache.resetExpire()) {
-                // Get data and reset the expiration time
-                cacheResult = tuCacheService.get(cacheKey, returnType, tuCache.expire());
-            } else {
-                cacheResult = tuCacheService.get(cacheKey, returnType);
+                return pjp.proceed();
             }
+            TuCache tuCache = method.getAnnotation(TuCache.class);
 
-        } catch (Exception e) {
+            Object[] args = pjp.getArgs();
+            String spElKey = StringUtils.isEmpty(tuCache.key()) ? tuCache.value() : tuCache.key();
 
-            log.warn("cache miss,key:" + cacheKey);
-            log.error(e.getMessage(), e);
+            String cacheKey = TuCacheUtil.parseKey(spElKey, targetObj, method, tuCacheProfiles.getCachePrefix(), args);
 
-            return pjp.proceed();
-        }
-        if (cacheResult == null) {
-            cacheResult = pjp.proceed();
+            Object cacheResult;
+
+            // 从缓存中获取数据，如果出错，则直接返回方法处理
             try {
-                if (cacheResult != null) {
-                    if (tuCache.expire() == -1) {
-                        tuCacheService.set(cacheKey, cacheResult);
-                    } else {
-                        tuCacheService.set(cacheKey, cacheResult, tuCache.expire());
-                    }
+                if (tuCache.resetExpire()) {
+                    // Get data and reset the expiration time
+                    cacheResult = tuCacheService.get(cacheKey, returnType, tuCache.expire());
+                } else {
+                    cacheResult = tuCacheService.get(cacheKey, returnType);
                 }
+
             } catch (Exception e) {
+
                 log.warn("cache miss,key:" + cacheKey);
                 log.error(e.getMessage(), e);
 
-                return cacheResult;
+                return pjp.proceed();
             }
+            // 如果缓存中没有数据就放入，否则直接返回缓存的数据
+            // 如果缓存中返回的是null，就认为没有缓存，直接运行方法获取最新数据
+            if (cacheResult == null) {
+                cacheResult = pjp.proceed();
+                try {
+                    if (cacheResult != null) {
+                        if (tuCache.expire() == -1) {
+                            tuCacheService.set(cacheKey, cacheResult);
+                        } else {
+                            tuCacheService.set(cacheKey, cacheResult, tuCache.expire());
+                        }
+                    }
+                } catch (Exception e) {
+                    log.warn("cache miss,key:" + cacheKey);
+                    log.error(e.getMessage(), e);
+                }
+            }
+
+            return cacheResult;
         }
 
-        return cacheResult;
+        return pjp.proceed();
     }
 
     @Around("@annotation(co.tunan.tucache.core.annotation.TuCacheClear)")
     public Object clear(ProceedingJoinPoint pjp) throws Throwable {
         log.debug("tu-cache clear.");
-        Signature signature = pjp.getSignature();
-        MethodSignature methodSignature = (MethodSignature) signature;
-        Method targetMethod = methodSignature.getMethod();
-        TuCacheClear tuCacheClear = targetMethod.getAnnotation(TuCacheClear.class);
-        if (tuCacheClear != null) {
-            Method method = getMethod(pjp);
+        if (checkTuCacheService()) {
+            Object targetObj = pjp.getTarget();
+
+            Signature signature = pjp.getSignature();
+            MethodSignature methodSignature = (MethodSignature) signature;
+            Method method = methodSignature.getMethod();
+            TuCacheClear tuCacheClear = method.getAnnotation(TuCacheClear.class);
             Object[] args = pjp.getArgs();
+
             String[] key = tuCacheClear.key().length == 0 ? tuCacheClear.value() : tuCacheClear.key();
             String[] keys = tuCacheClear.keys();
-            Object targetObj = pjp.getTarget();
+
             try {
                 if (key.length > 0) {
                     for (String item : key) {
-                        String ckey = parseKey(item, targetObj, method, args);
+                        String ckey = TuCacheUtil.parseKey(item, targetObj, method,
+                                tuCacheProfiles.getCachePrefix(), args);
                         if (tuCacheClear.sync()) {
                             threadPool.submit(() -> tuCacheService.delete(ckey));
                         } else {
@@ -133,7 +136,8 @@ public class TuCacheAspect {
                 }
                 if (keys.length > 0) {
                     for (String item : keys) {
-                        String ckey = parseKey(item, targetObj, method, args);
+                        String ckey = TuCacheUtil.parseKey(item, targetObj,
+                                method, tuCacheProfiles.getCachePrefix(), args);
                         if (tuCacheClear.sync()) {
                             threadPool.submit(() -> tuCacheService.deleteKeys(ckey));
                         } else {
@@ -142,7 +146,6 @@ public class TuCacheAspect {
                     }
                 }
             } catch (Exception e) {
-
                 log.warn("failed to clean cache.");
                 log.error(e.getMessage(), e);
             }
@@ -155,60 +158,37 @@ public class TuCacheAspect {
         this.tuCacheService = tuCacheService;
     }
 
-    private Method getMethod(ProceedingJoinPoint pjp) throws NoSuchMethodException {
-        //获取参数的类型
-        Class[] argTypes = ((MethodSignature) pjp.getSignature()).getParameterTypes();
-        Method method = pjp.getTarget().getClass().getMethod(pjp.getSignature().getName(), argTypes);
+    private boolean checkTuCacheService() {
 
-        return method;
+        if (tuCacheService == null) {
 
-    }
+            log.warn("TuCacheService at least one implementation, or closed tucache[tucache.enable=false]");
 
-    private String parseKey(String spEl, Object targetObj, Method method, Object[] args) {
-        // SpEL表达式为空默认返回方法名
-        if (StringUtils.isEmpty(spEl)) {
-            // 生成默认的key
-            return defaultKey(method, args);
-        }
-        ExpressionParser parser = new SpelExpressionParser();
-        ParserContext parserContext = new ParserContext() {
-            @Override
-            public boolean isTemplate() {
-                return true;
-            }
-
-            @Override
-            public String getExpressionPrefix() {
-                return "#{";
-            }
-
-            @Override
-            public String getExpressionSuffix() {
-                return "}";
-            }
-        };
-        StandardEvaluationContext context = new MethodBasedEvaluationContext(targetObj, method, args,
-                new DefaultParameterNameDiscoverer());
-
-        String keyPrefix = "";
-        if (tuCacheProfiles != null && !StringUtils.isEmpty(tuCacheProfiles.getCachePrefix())) {
-            keyPrefix = tuCacheProfiles.getCachePrefix();
+            return false;
         }
 
-        return keyPrefix + parser.parseExpression(spEl, parserContext).getValue(context, String.class);
-    }
+        return true;
 
-    private String defaultKey(Method method, Object[] args) {
-        String defaultKey = method.getDeclaringClass().getPackage().getName() + method.getDeclaringClass().getName() + ":" + method.getName();
-        StringBuilder builder = new StringBuilder(defaultKey);
-        for (Object a : args) {
-            builder.append(a.hashCode()).append("_");
-        }
-
-        return builder.toString();
     }
 
     public void setTuCacheProfiles(TuCacheProfiles tuCacheProfiles) {
         this.tuCacheProfiles = tuCacheProfiles;
+    }
+
+    /**
+     * 默认线程池配置，核心线程为CPU核心数，最大线程为CPU核心*4
+     * keepAliveTime 10秒，线程空闲时间超过10秒则关闭，保留核心线程
+     * 队列长度为 Integer.MAX_VALUE
+     */
+    private void initThreadPool() {
+        threadPool = new ThreadPoolExecutor(SystemInfo.MACHINE_CORE_NUM, SystemInfo.MACHINE_CORE_NUM * 4,
+                10L, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(Integer.MAX_VALUE),
+                Executors.defaultThreadFactory(),
+                new ThreadPoolExecutor.AbortPolicy());
+    }
+
+    public ExecutorService getThreadPool() {
+        return threadPool;
     }
 }

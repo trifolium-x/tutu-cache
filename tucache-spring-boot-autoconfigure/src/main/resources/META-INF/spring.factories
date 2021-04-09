@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+co.tunan.tucache.autoconfigure.configure.TuCacheAutoConfigure

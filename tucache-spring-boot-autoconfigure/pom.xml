@@ -7,21 +7,16 @@
         <groupId>co.tunan.tucache</groupId>
         <version>1.0.0</version>
     </parent>
-
-    <version>1.0.0</version>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>tucache-core</artifactId>
+    <artifactId>tucache-spring-boot-autoconfigure</artifactId>
 
     <properties>
-        <spring.version>5.1.3.RELEASE</spring.version>
+        <spring.boot.version>2.1.1.RELEASE</spring.boot.version>
         <spring.data.redis.version>2.1.3.RELEASE</spring.data.redis.version>
     </properties>
 
-    <packaging>jar</packaging>
-
     <dependencies>
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -36,37 +31,37 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- spring的大部分依赖都在此,并且项目支持AOP -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
-            <scope>provided</scope>
+            <groupId>co.tunan.tucache</groupId>
+            <artifactId>tucache-core</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <version>${spring.boot.version}</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
             <version>${spring.data.redis.version}</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
-            <version>1.9.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjrt</artifactId>
-            <version>1.9.5</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <version>${spring.boot.version}</version>
+            <optional>true</optional>
         </dependency>
 
     </dependencies>
 
     <build>
-        <finalName>tucache-core.${project.version}</finalName>
+        <finalName>tucache-spring-boot-autoconfigure.${project.version}</finalName>
     </build>
 
 </project>

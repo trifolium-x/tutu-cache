@@ -2,21 +2,22 @@ package co.tunan.tucache.core;
 
 import co.tunan.tucache.core.aspect.TuCacheAspect;
 import co.tunan.tucache.core.cache.TuCacheService;
-import co.tunan.tucache.core.cache.impl.RedisCacheService;
 import co.tunan.tucache.core.config.TuCacheProfiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.lang.Nullable;
 
-public class TuCacheBean implements BeanFactoryPostProcessor, BeanFactoryAware, InitializingBean, DisposableBean {
+public class TuCacheBean implements BeanDefinitionRegistryPostProcessor, BeanFactoryAware, InitializingBean, DisposableBean {
 
     private final static Logger log = LoggerFactory.getLogger(TuCacheBean.class);
 
@@ -32,7 +33,7 @@ public class TuCacheBean implements BeanFactoryPostProcessor, BeanFactoryAware, 
         this.tuCacheService = tuCacheService;
     }
 
-    public TuCacheBean() {
+    public TuCacheBean(){
 
     }
 
@@ -48,22 +49,6 @@ public class TuCacheBean implements BeanFactoryPostProcessor, BeanFactoryAware, 
         if (beanFactory == null) {
             throw new IllegalStateException("Cannot get default tuCacheService.");
         }
-
-        if (tuCacheService == null) {
-            tuCacheService = defaultTuCacheService();
-        }
-    }
-
-    @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-
-        if (this.tuCacheService == null) {
-            throw new IllegalStateException("not find bean tuCacheService.");
-        }
-        TuCacheAspect tuCacheAspect = new TuCacheAspect();
-        tuCacheAspect.setTuCacheService(tuCacheService);
-        tuCacheAspect.setTuCacheProfiles(tuCacheProfiles);
-        beanFactory.registerSingleton("tuCacheAspect", tuCacheAspect);
     }
 
     /**
@@ -73,9 +58,9 @@ public class TuCacheBean implements BeanFactoryPostProcessor, BeanFactoryAware, 
     public void destroy() throws Exception {
 
         TuCacheAspect tuCacheAspect = beanFactory.getBean(TuCacheAspect.class);
-        tuCacheAspect.threadPool.shutdown();
+        tuCacheAspect.getThreadPool().shutdown();
 
-        log.info("TuCache is destroy");
+        log.info("tucache is destroy");
     }
 
     public void setTuCacheService(TuCacheService tuCacheService) {
@@ -87,10 +72,26 @@ public class TuCacheBean implements BeanFactoryPostProcessor, BeanFactoryAware, 
         this.tuCacheProfiles = tuCacheProfiles;
     }
 
-    private TuCacheService defaultTuCacheService() {
-        RedisCacheService redisCacheService = new RedisCacheService();
-        redisCacheService.setRedisTemplate(beanFactory.getBean(RedisTemplate.class));
+    @Override
+    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+        if (this.tuCacheService == null) {
+            log.warn("TuCacheService at least one implementation, or closed tucache[tucache.enable=false]");
+        }
 
-        return redisCacheService;
+        GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+        beanDefinition.setBeanClass(TuCacheAspect.class);
+
+        MutablePropertyValues propertyValues = new MutablePropertyValues();
+        propertyValues.add("tuCacheService", tuCacheService);
+        propertyValues.add("tuCacheProfiles", tuCacheProfiles);
+
+        beanDefinition.setPropertyValues(propertyValues);
+
+        registry.registerBeanDefinition("tuCacheAspect", beanDefinition);
+
+    }
+
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
     }
 }

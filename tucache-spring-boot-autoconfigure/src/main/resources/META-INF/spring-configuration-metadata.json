@@ -1,0 +1,32 @@
+{
+  "groups": [
+    {
+      "name": "tucache",
+      "type": "co.tunan.tucache.starter.configure.TuCacheConfigure",
+      "sourceType": "co.tunan.tucache.starter.configure.TuCacheConfigure"
+    },
+    {
+      "name": "tucache.profiles",
+      "type": "co.tunan.tucache.core.config.TuCacheProfiles",
+      "sourceMethod": "getProfiles()",
+      "sourceType": "co.tunan.tucache.starter.configure.TuCacheConfigure"
+    }
+  ],
+  "properties": [
+    {
+      "name": "tucache.enable",
+      "defaultValue": true,
+      "type": "java.lang.Boolean",
+      "sourceType": "co.tunan.tucache.starter.configure.TuCacheConfigure",
+      "description": "Whether to open the TuCache function."
+    },
+    {
+      "name": "tucache.profiles.cachePrefix",
+      "defaultValue": "",
+      "type": "java.lang.String",
+      "sourceType": "co.tunan.tucache.core.config.TuCacheProfiles",
+      "description": "Cache key prefix."
+    }
+  ],
+  "hints": []
+}

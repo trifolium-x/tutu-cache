@@ -28,11 +28,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>co.tunan.tucache</groupId>
-    <artifactId>parent</artifactId>
+    <artifactId>tutucache</artifactId>
     <version>1.0.0</version>
     <modules>
         <module>tucache-core</module>
         <module>tucache-spring-boot-starter</module>
+        <module>tucache-spring-boot-autoconfigure</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -62,7 +63,6 @@
     </developers>
 
     <properties>
-        <project.version>1.0.0</project.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>

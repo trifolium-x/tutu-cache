@@ -6,11 +6,27 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
         ```xml
            <dependency>
                <groupId>co.tunan.tucache</groupId>
-               <artifactId>spring-boot-starter</artifactId>
+               <artifactId>tucache-spring-boot-starter</artifactId>
                <version>1.0.0</version>
            </dependency>
+           <dependency>
+               <groupId>org.springframework.boot</groupId>
+               <artifactId>spring-boot-starter-data-redis</artifactId>
+           </dependency>
+           <!-- 或者其他缓存 -->
         ```
     * 在Configure类中注册javaBean redisTemplate或者使用默认的redisTemplate，必须开启aspectj的aop功能(默认是开启的)
+      ```java
+      @Bean(name = "redisTemplate")
+      public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+            RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+            redisTemplate.setKeySerializer(new StringRedisSerializer());
+
+            redisTemplate.setConnectionFactory(redisConnectionFactory);
+
+            return redisTemplate;
+      }
+      ```
 2. 在springMVC中的使用
     * 引入jar依赖包
         ```xml
@@ -85,18 +101,20 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
         }
         ```
     * _注意key和keys的区别_
-    
+
+### 版本对应的spring框架
+* tucache 1.0.0 ----- spring 5.1.3.RELEASE+ ----- springBoot版本2.1.1.RELEASE+
 ### 高级使用
-* tutu-cache默认提供了 RedisTuCacheService,如果用户使用的缓存是redis自动使用该默认缓存服务。
+* tutu-cache默认提供了 RedisTuCacheService,如果用户使用的缓存是redis并配置了redisTemplate的bean则自动使用该默认缓存服务。
 * 用户使用其他缓存，则需要自定义TuCacheService，实现该接口并注入到TuCacheBean中
-* 在SpringBoot中则在Configure类中配置相应的bean自动使用自定义的bean
+* 在SpringBoot中在Configure类中配置相应的bean自动使用自定义的bean
 * 如果用户需要每个缓存前面添加同意的keyPrefix，TuCacheBean的prefixKey参数
 * springBoot中配置
     ```yaml
     tucache:
       enable: true
       profiles:
-        cache-prefix: my_tu_key_test:
+        cache-prefix: "my_tu_key_test:"
     ```
 * springMVC中注入到TuCacheBean
     ```xml
@@ -108,7 +126,7 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
         <property name="tuCacheProfiles" ref="tucacheProfiles" />
     </bean>
     ```
-* 关于默认RedisTuCacheService的序列化问题，建议使用Json的方式序列化值,高效率的情况下可以使用java序列化
+* 关于默认RedisTuCacheService的序列化问题，强烈建议使用对key使用String方式序列化
 * 使用Json序列化配置样例如下:
     ```java
     @Bean(name = "redisTemplate")
@@ -122,29 +140,5 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
         redisTemplate.setConnectionFactory(redisConnectionFactory);
 
         return redisTemplate;
-    }
-
-    private ObjectMapper createGenericObjectMapper() {
-        final ObjectMapper objectMapper = new ObjectMapper();
-
-        objectMapper.setTimeZone(TimeZone.getTimeZone("GMT+8"));
-
-        objectMapper.registerModule(new SimpleModule().addSerializer(new StdSerializer<NullValue>(NullValue.class) {
-            private String classIdentifier;
-
-            @Override
-            public void serialize(NullValue value, JsonGenerator jgen, SerializerProvider provider)
-                    throws IOException {
-                classIdentifier = StringUtils.hasText(classIdentifier) ? classIdentifier : "@class";
-                jgen.writeStartObject();
-                jgen.writeStringField(classIdentifier, NullValue.class.getName());
-                jgen.writeEndObject();
-            }
-        }));
-
-
-        objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
-
-        return objectMapper;
     }
     ```
