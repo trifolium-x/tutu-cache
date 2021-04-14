@@ -7,7 +7,7 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
            <dependency>
                <groupId>co.tunan.tucache</groupId>
                <artifactId>tucache-spring-boot-starter</artifactId>
-               <version>1.0.0</version>
+               <version>1.0.1</version>
            </dependency>
            <dependency>
                <groupId>org.springframework.boot</groupId>
@@ -33,7 +33,7 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
         <dependency>
           <groupId>co.tunan.tucache</groupId>
           <artifactId>cache-core</artifactId>
-          <version>1.0.0</version>
+          <version>1.0.1</version>
         </dependency>
         ```
     * 在applicationContent.xml中配置
@@ -43,7 +43,7 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
             <property name="redisTemplate" ref="redisTemplate" />
         </bean>
       
-        <bean id="tuCacheBean" class="co.tunan.tucache.core.TuCacheBean">
+        <bean id="tuCacheBean" class="co.tunan.tucache.core.aspect.TuCacheAspect">
             <property name="tuCacheService" ref="redisCacheService" />
         </bean>
       
@@ -103,7 +103,7 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
     * _注意key和keys的区别_
 
 ### 版本对应的spring框架
-* tucache 1.0.0 ----- spring 5.1.3.RELEASE+ ----- springBoot版本2.1.1.RELEASE+
+* tucache 1.0.1 ----- spring 5.1.3.RELEASE+ ----- springBoot版本2.1.1.RELEASE+
 ### 高级使用
 * tutu-cache默认提供了 RedisTuCacheService,如果用户使用的缓存是redis并配置了redisTemplate的bean则自动使用该默认缓存服务。
 * 用户使用其他缓存，则需要自定义TuCacheService，实现该接口并注入到TuCacheBean中
@@ -118,12 +118,12 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
     ```
 * springMVC中注入到TuCacheBean
     ```xml
-    <bean id="tucacheProfiles" class="co.tunan.tucache.core.config.TuCacheProfiles">
+    <bean id="tuCacheProperties" class="co.tunan.tucache.core.config.TuCacheProperties">
         <property name="cachePrefix" value="test_tucache_prefixkey:" />
     </bean>
-    <bean id="tuCacheBean" class="co.tunan.tucache.core.TuCacheBean">
+    <bean id="tuCacheBean" class="co.tunan.tucache.core.aspect.TuCacheAspect">
         <property name="tuCacheService" ref="redisCacheService" />
-        <property name="tuCacheProfiles" ref="tucacheProfiles" />
+        <property name="tuCacheProperties" ref="tuCacheProperties" />
     </bean>
     ```
 * 关于默认RedisTuCacheService的序列化问题，强烈建议使用对key使用String方式序列化

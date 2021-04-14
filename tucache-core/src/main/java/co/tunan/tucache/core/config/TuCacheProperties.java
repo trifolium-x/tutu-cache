@@ -1,6 +1,6 @@
 package co.tunan.tucache.core.config;
 
-public class TuCacheProfiles {
+public class TuCacheProperties {
 
     /**
      * 缓存的统一key前缀，默认为 ""
