@@ -5,7 +5,7 @@
     <parent>
         <artifactId>tutucache</artifactId>
         <groupId>co.tunan.tucache</groupId>
-        <version>1.0.0</version>
+        <version>1.0.1.RELEASE</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -18,13 +18,13 @@
         <dependency>
             <groupId>co.tunan.tucache</groupId>
             <artifactId>tucache-core</artifactId>
-            <version>1.0.0</version>
+            <version>${parent.version}</version>
         </dependency>
 
         <dependency>
             <groupId>co.tunan.tucache</groupId>
             <artifactId>tucache-spring-boot-autoconfigure</artifactId>
-            <version>1.0.0</version>
+            <version>${parent.version}</version>
         </dependency>
 
     </dependencies>

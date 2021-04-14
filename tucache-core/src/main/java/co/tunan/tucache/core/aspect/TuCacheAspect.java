@@ -2,10 +2,11 @@ package co.tunan.tucache.core.aspect;
 
 import co.tunan.tucache.core.annotation.TuCache;
 import co.tunan.tucache.core.annotation.TuCacheClear;
+import co.tunan.tucache.core.bean.TuKeyGenerate;
+import co.tunan.tucache.core.bean.impl.DefaultTuKeyGenerate;
 import co.tunan.tucache.core.cache.TuCacheService;
 import co.tunan.tucache.core.config.TuCacheProfiles;
 import co.tunan.tucache.core.util.SystemInfo;
-import co.tunan.tucache.core.util.TuCacheUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
@@ -13,6 +14,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
@@ -25,7 +27,7 @@ import java.util.concurrent.*;
  * @modified :
  */
 @Aspect
-public class TuCacheAspect {
+public class TuCacheAspect implements DisposableBean {
 
     private final static Logger log = LoggerFactory.getLogger(TuCacheAspect.class);
 
@@ -36,7 +38,9 @@ public class TuCacheAspect {
 
     private TuCacheService tuCacheService;
 
-    private TuCacheProfiles tuCacheProfiles;
+    private TuCacheProfiles tuCacheProfiles = new TuCacheProfiles();
+
+    private TuKeyGenerate tuKeyGenerate = new DefaultTuKeyGenerate();
 
     public TuCacheAspect() {
 
@@ -47,7 +51,7 @@ public class TuCacheAspect {
     public Object cache(ProceedingJoinPoint pjp) throws Throwable {
         log.debug("tu-cache caching");
 
-        if (checkTuCacheService()) {
+        if (tuCacheService != null) {
 
             Object targetObj = pjp.getTarget();
             Signature signature = pjp.getSignature();
@@ -63,7 +67,7 @@ public class TuCacheAspect {
             Object[] args = pjp.getArgs();
             String spElKey = StringUtils.isEmpty(tuCache.key()) ? tuCache.value() : tuCache.key();
 
-            String cacheKey = TuCacheUtil.parseKey(spElKey, targetObj, method, tuCacheProfiles.getCachePrefix(), args);
+            String cacheKey = tuKeyGenerate.generate(tuCacheProfiles, spElKey, targetObj, method, args);
 
             Object cacheResult;
 
@@ -110,7 +114,7 @@ public class TuCacheAspect {
     @Around("@annotation(co.tunan.tucache.core.annotation.TuCacheClear)")
     public Object clear(ProceedingJoinPoint pjp) throws Throwable {
         log.debug("tu-cache clear.");
-        if (checkTuCacheService()) {
+        if (tuCacheService != null) {
             Object targetObj = pjp.getTarget();
 
             Signature signature = pjp.getSignature();
@@ -125,8 +129,7 @@ public class TuCacheAspect {
             try {
                 if (key.length > 0) {
                     for (String item : key) {
-                        String ckey = TuCacheUtil.parseKey(item, targetObj, method,
-                                tuCacheProfiles.getCachePrefix(), args);
+                        String ckey = tuKeyGenerate.generate(tuCacheProfiles, item, targetObj, method, args);
                         if (tuCacheClear.sync()) {
                             threadPool.submit(() -> tuCacheService.delete(ckey));
                         } else {
@@ -136,8 +139,7 @@ public class TuCacheAspect {
                 }
                 if (keys.length > 0) {
                     for (String item : keys) {
-                        String ckey = TuCacheUtil.parseKey(item, targetObj,
-                                method, tuCacheProfiles.getCachePrefix(), args);
+                        String ckey = tuKeyGenerate.generate(tuCacheProfiles, item, targetObj, method, args);
                         if (tuCacheClear.sync()) {
                             threadPool.submit(() -> tuCacheService.deleteKeys(ckey));
                         } else {
@@ -155,24 +157,20 @@ public class TuCacheAspect {
     }
 
     public void setTuCacheService(TuCacheService tuCacheService) {
-        this.tuCacheService = tuCacheService;
-    }
 
-    private boolean checkTuCacheService() {
+        this.tuCacheService = tuCacheService;
 
         if (tuCacheService == null) {
-
             log.warn("TuCacheService at least one implementation, or closed tucache[tucache.enable=false]");
-
-            return false;
         }
-
-        return true;
-
     }
 
     public void setTuCacheProfiles(TuCacheProfiles tuCacheProfiles) {
         this.tuCacheProfiles = tuCacheProfiles;
+    }
+
+    public void setTuKeyGenerate(TuKeyGenerate tuKeyGenerate) {
+        this.tuKeyGenerate = tuKeyGenerate;
     }
 
     /**
@@ -190,5 +188,16 @@ public class TuCacheAspect {
 
     public ExecutorService getThreadPool() {
         return threadPool;
+    }
+
+    /**
+     * Implement the DisposableBean interface, cleanup static variables when the Context is closed.
+     */
+    @Override
+    public void destroy() throws Exception {
+
+        this.getThreadPool().shutdown();
+
+        log.info("tucache is destroy");
     }
 }

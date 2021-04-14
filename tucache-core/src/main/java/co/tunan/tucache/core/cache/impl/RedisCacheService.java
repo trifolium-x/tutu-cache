@@ -2,34 +2,26 @@ package co.tunan.tucache.core.cache.impl;
 
 import co.tunan.tucache.core.cache.TuCacheService;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 /**
  * The default TuCacheService implementation class
- * Created by v_wangxudong on 2019/3/14.
+ * Created by wangxudong on 2019/3/14.
  */
 public class RedisCacheService implements TuCacheService {
 
-//    private RedisTemplate<String, Object> redisTemplate;
-
-    private Supplier<Object> redisTemplateSupplier;
-
-    private List<RedisTemplate<Object, Object>> redisTemplates;
+    private RedisTemplate<String, Object> redisTemplate;
 
     private static final long NOT_EXPIRE = -1;
 
     @Override
     public void set(String key, Object value, long expire) {
-        getRedisTemplate().opsForValue().set(key, value);
+        redisTemplate.opsForValue().set(key, value);
         if (expire != NOT_EXPIRE) {
-            getRedisTemplate().expire(key, expire, TimeUnit.SECONDS);
+            redisTemplate.expire(key, expire, TimeUnit.SECONDS);
         }
     }
 
@@ -40,13 +32,13 @@ public class RedisCacheService implements TuCacheService {
 
     @Override
     public void delete(String key) {
-        getRedisTemplate().delete(key);
+        redisTemplate.delete(key);
     }
 
     @Override
     public void deleteKeys(String key) {
-        Set<Object> keys = getRedisTemplate().keys(key + "*");
-        getRedisTemplate().delete(keys);
+        Set<String> keys = redisTemplate.keys(key + "*");
+        redisTemplate.delete(keys);
     }
 
     @Override
@@ -56,10 +48,10 @@ public class RedisCacheService implements TuCacheService {
 
     @Override
     public <T> T get(String key, Class<T> clazz, long expire) {
-        Object value = getRedisTemplate().opsForValue().get(key);
+        Object value = redisTemplate.opsForValue().get(key);
 
         if (expire != NOT_EXPIRE) {
-            getRedisTemplate().expire(key, expire, TimeUnit.SECONDS);
+            redisTemplate.expire(key, expire, TimeUnit.SECONDS);
         }
 
         if (value == null)
@@ -83,23 +75,9 @@ public class RedisCacheService implements TuCacheService {
 
     }
 
-    public void setRedisTemplateSupplier(Supplier<Object> supplier) {
-        this.redisTemplateSupplier = supplier;
+    public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
     }
 
-    private RedisTemplate<Object, Object> getRedisTemplate() {
-
-        if (CollectionUtils.isEmpty(redisTemplates)) {
-            RedisTemplate<Object, Object> redisTemplate = (RedisTemplate<Object, Object>)redisTemplateSupplier.get();
-
-            if (redisTemplate == null) {
-                throw new NullPointerException("redis template is null.");
-            }
-            this.redisTemplates = new ArrayList<>(1);
-            redisTemplates.add(redisTemplate);
-        }
-
-        return redisTemplates.get(0);
-    }
 }
 

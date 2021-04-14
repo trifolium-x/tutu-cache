@@ -3,17 +3,22 @@ package co.tunan.tucache.autoconfigure.configure;
 import co.tunan.tucache.core.config.TuCacheProfiles;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 
 @ConfigurationProperties("tucache")
 public class TuCacheConfigure {
 
-    private boolean enable = true;
+    private boolean enabled = true;
 
     @NestedConfigurationProperty
     private TuCacheProfiles profiles = new TuCacheProfiles();
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     public TuCacheProfiles getProfiles() {
         return profiles;
@@ -23,23 +28,9 @@ public class TuCacheConfigure {
         this.profiles = profiles;
     }
 
-    public boolean isEnable() {
-        return enable;
-    }
-
-    public void setEnable(boolean enable) {
-        this.enable = enable;
-    }
-
-
-    @PostConstruct
-    public void init() {
-
-    }
-
     @Override
     public String toString() {
 
-        return "enable:" + enable + "," + this.profiles;
+        return "enable:" + enabled + "," + this.profiles;
     }
 }

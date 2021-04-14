@@ -1,5 +1,7 @@
-package co.tunan.tucache.core.util;
+package co.tunan.tucache.core.bean.impl;
 
+import co.tunan.tucache.core.bean.TuKeyGenerate;
+import co.tunan.tucache.core.config.TuCacheProfiles;
 import org.springframework.context.expression.MethodBasedEvaluationContext;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.expression.ExpressionParser;
@@ -11,18 +13,19 @@ import org.springframework.util.StringUtils;
 import java.lang.reflect.Method;
 
 /**
- * @author: wangxudong
- * @date: 2021/4/9
+ * Created by wangxudong on 2021/4/15.
+ *
  * @version: 1.0
  * @modified :
  */
-public class TuCacheUtil {
+public class DefaultTuKeyGenerate implements TuKeyGenerate {
+    @Override
+    public String generate(TuCacheProfiles profiles, String originKey, Object rootObject, Method method, Object[] arguments) {
 
-    public static String parseKey(String spEl, Object targetObj, Method method, String keyPrefix, Object[] args) {
         // SpEL表达式为空默认返回方法名
-        if (StringUtils.isEmpty(spEl)) {
+        if (StringUtils.isEmpty(originKey)) {
             // 生成默认的key
-            return defaultKey(method, args);
+            return defaultKey(method, arguments);
         }
         ExpressionParser parser = new SpelExpressionParser();
         ParserContext parserContext = new ParserContext() {
@@ -41,17 +44,18 @@ public class TuCacheUtil {
                 return "}";
             }
         };
-        StandardEvaluationContext context = new MethodBasedEvaluationContext(targetObj, method, args,
+        StandardEvaluationContext context = new MethodBasedEvaluationContext(rootObject, method, arguments,
                 new DefaultParameterNameDiscoverer());
 
-        if (keyPrefix == null) {
-            keyPrefix = "";
+        String keyPrefix = "";
+        if (profiles.getCachePrefix() != null) {
+            keyPrefix = profiles.getCachePrefix();
         }
 
-        return keyPrefix + parser.parseExpression(spEl, parserContext).getValue(context, String.class);
+        return keyPrefix + parser.parseExpression(originKey, parserContext).getValue(context, String.class);
     }
 
-    private static String defaultKey(Method method, Object[] args) {
+    private String defaultKey(Method method, Object[] args) {
         String defaultKey = method.getDeclaringClass().getPackage().getName() + method.getDeclaringClass().getName() + ":" + method.getName();
         StringBuilder builder = new StringBuilder(defaultKey);
         for (Object a : args) {
