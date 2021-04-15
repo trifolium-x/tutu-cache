@@ -72,3 +72,6 @@ gen_code
 .project
 .settings
 .springBeans
+/tucache-core/target/
+/tucache-spring-boot-autoconfigure/target/
+/tucache-spring-boot-starter/target/
