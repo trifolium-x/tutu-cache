@@ -2,6 +2,10 @@ package co.tunan.tucache.core.bean.impl;
 
 import co.tunan.tucache.core.bean.TuKeyGenerate;
 import co.tunan.tucache.core.config.TuCacheProfiles;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.context.expression.MethodBasedEvaluationContext;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.expression.ExpressionParser;
@@ -18,7 +22,10 @@ import java.lang.reflect.Method;
  * @version: 1.0
  * @modified :
  */
-public class DefaultTuKeyGenerate implements TuKeyGenerate {
+public class DefaultTuKeyGenerate implements TuKeyGenerate, BeanFactoryAware {
+
+    private BeanFactory beanFactory;
+
     @Override
     public String generate(TuCacheProfiles profiles, String originKey, Object rootObject, Method method, Object[] arguments) {
 
@@ -47,6 +54,9 @@ public class DefaultTuKeyGenerate implements TuKeyGenerate {
         StandardEvaluationContext context = new MethodBasedEvaluationContext(rootObject, method, arguments,
                 new DefaultParameterNameDiscoverer());
 
+        // 加入使用@符号访问bean能力
+        context.setBeanResolver(new BeanFactoryResolver(beanFactory));
+
         String keyPrefix = "";
         if (profiles.getCachePrefix() != null) {
             keyPrefix = profiles.getCachePrefix();
@@ -63,5 +73,12 @@ public class DefaultTuKeyGenerate implements TuKeyGenerate {
         }
 
         return builder.toString();
+    }
+
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+
+        this.beanFactory = beanFactory;
     }
 }
