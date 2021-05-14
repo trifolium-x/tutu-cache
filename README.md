@@ -80,7 +80,7 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
         }
       
         // 如果需要调用本地的方法
-        @TuCache(key="test_service:getList:#{this.endStr()}",expire = 120)
+        @TuCache(key="test_service:getList:#{#this.endStr()}",expire = 120)
         public List<String> getList(){
             return Arrays.asList("tu","nan",endStr());
         }
