@@ -1,5 +1,10 @@
 tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的SpringAop项目。
 使用tutu-cache注解来代替@Cacheable和@CacheEvict等注解
+
+[![GitHub license](https://img.shields.io/github/license/trifolium-wang/tutu-cache)](https://github.com/trifolium-wang/tutu-cache/blob/master/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/trifolium-wang/tutu-cache)](https://github.com/trifolium-wang/tutu-cache/issues)
+[![RELEASE](https://img.shields.io/badge/RELEASE-1.0.1.RELEASE-blue)](https://github.com/trifolium-wang/tutu-cache/releases/tag/1.0.1.RELEASE)
+
 ### 版本
 * 发行版本 1.0.1.RELEASE(稳定)
 * 测试版本 1.0.0(缺陷) 1.0.1(缺陷)
