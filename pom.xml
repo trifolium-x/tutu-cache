@@ -29,7 +29,7 @@
 
     <groupId>co.tunan.tucache</groupId>
     <artifactId>tutucache</artifactId>
-    <version>1.0.1.RELEASE</version>
+    <version>1.0.2.RELEASE</version>
     <modules>
         <module>tucache-core</module>
         <module>tucache-spring-boot-starter</module>
@@ -59,7 +59,7 @@
     <developers>
         <developer>
             <name>Trifolium wang</name>
-            <email>xudong1113@foxmail.com</email>
+            <email>trifolium.wang@foxmail.com</email>
             <organization>QQ Group 76131683</organization>
         </developer>
     </developers>
