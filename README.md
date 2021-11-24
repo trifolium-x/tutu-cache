@@ -7,7 +7,8 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
 
 ### 版本
 * 发行版本 1.0.1.RELEASE(稳定)
-* 测试版本 1.0.0(缺陷) 1.0.1(缺陷)
+* 1.0.1 (公测版本)
+* 测试版本 1.0.0(内测有缺陷) 
 ### 引入tutu-cache
 1. 在springBoot中的使用
     * 引入jar依赖包
@@ -150,3 +151,6 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
         return redisTemplate;
     }
     ```
+  
+## 友情连接
+[OkHttps 超级优雅的 API 设计，且链式调用，让你顺滑到底！超级轻量，但性能卓越！](https://gitee.com/ejlchina-zhxu/okhttps)
