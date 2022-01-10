@@ -34,7 +34,11 @@ public @interface TuCacheClear {
 
     String[] keys() default {};
 
-    boolean sync() default false;
+    /**
+     * Whether to perform cache clearing asynchronously. If the real-time performance of cache deletion is not strictly required, you can use asynchronous cache clearing to improve performance
+     * 是否异步执行缓存清理，如果不严格要求缓存删除的实时性，提高性能可以使用异步方式进行清除缓存
+     */
+    boolean async() default false;
 
     String condition() default "true";
 }

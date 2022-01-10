@@ -138,7 +138,7 @@ public class TuCacheAspect implements DisposableBean {
                 if (key.length > 0) {
                     for (String item : key) {
                         String ckey = tuKeyGenerate.generate(tuCacheProfiles, item, targetObj, method, args);
-                        if (tuCacheClear.sync()) {
+                        if (tuCacheClear.async()) {
                             threadPool.submit(() -> tuCacheService.delete(ckey));
                         } else {
                             tuCacheService.delete(ckey);
@@ -148,7 +148,7 @@ public class TuCacheAspect implements DisposableBean {
                 if (keys.length > 0) {
                     for (String item : keys) {
                         String ckey = tuKeyGenerate.generate(tuCacheProfiles, item, targetObj, method, args);
-                        if (tuCacheClear.sync()) {
+                        if (tuCacheClear.async()) {
                             threadPool.submit(() -> tuCacheService.deleteKeys(ckey));
                         } else {
                             tuCacheService.deleteKeys(ckey);
