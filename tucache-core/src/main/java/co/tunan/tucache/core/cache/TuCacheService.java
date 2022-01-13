@@ -7,9 +7,8 @@ import java.util.concurrent.TimeUnit;
  * If users need to use their own caches,
  * implement this interface to replace the default redis cache
  *
- * @author : wangxudong
- * @date: 2020/08/28 10:48
- * @see
+ * @author wangxudong
+ * @date 2020/08/28
  */
 public interface TuCacheService {
 

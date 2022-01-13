@@ -11,10 +11,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 
 /**
- * Created by wangxudong on 2021/4/14.
+ * tu-cache redis configuration
  *
- * @version: 1.0
- * @modified :
+ * @author wangxudong
+ * @date 2020/08/28
  */
 @Configuration
 @ConditionalOnClass(name = "org.springframework.data.redis.core.RedisTemplate")
@@ -26,7 +26,7 @@ public class RedisTuCacheConfigure {
     @ConditionalOnMissingBean(TuCacheService.class)
     public TuCacheService tuCacheService(RedisTemplate redisTemplate) {
 
-        log.info("use redis tucache service.");
+        log.info("use redis tu-cache service.");
         RedisCacheService redisCacheService = new RedisCacheService();
 
         redisCacheService.setRedisTemplate(redisTemplate);

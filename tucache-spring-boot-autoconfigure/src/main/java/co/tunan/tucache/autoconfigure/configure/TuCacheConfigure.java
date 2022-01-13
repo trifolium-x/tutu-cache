@@ -4,6 +4,12 @@ import co.tunan.tucache.core.config.TuCacheProfiles;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
+/**
+ * tu-cache configuration
+ *
+ * @author wangxudong
+ * @date 2020/08/28
+ */
 @ConfigurationProperties("tucache")
 public class TuCacheConfigure {
 
@@ -33,4 +39,5 @@ public class TuCacheConfigure {
 
         return "enable:" + enabled + "," + this.profiles;
     }
+
 }

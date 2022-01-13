@@ -7,15 +7,13 @@ import java.lang.annotation.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by wangxudong on 2020/04/09.
  * <p>
- * 该注解用于缓存方法返回的数据，key支持spel表达式
+ * 该注解用于缓存方法返回的数据，key支持spEl表达式
  * 可指定缓存过期时间和redis文档目录
  * <p>
  * 如果从缓存中拿不到或者出现超时，异常等情况则从方法中拿
- *
- * @version: 1.0
- * @modified :
+ * @author wangxudong
+ * @date 2020/08/28
  * @see TuCacheAspect
  */
 @Target({ElementType.METHOD})
@@ -35,7 +33,6 @@ public @interface TuCache {
      * 如果设置resetExpire为false的情况下，如果缓存中存在该缓存，则直接更新数据而不会重置时间。
      * condition, resetExpire 暂时无法使用
      */
-
     @AliasFor("key")
     String value() default "";
 

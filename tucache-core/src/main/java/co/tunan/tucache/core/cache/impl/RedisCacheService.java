@@ -9,7 +9,9 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * The default TuCacheService implementation class
- * Created by wangxudong on 2019/3/14.
+ *
+ * @author wangxudong
+ * @date 2019/3/14
  */
 public class RedisCacheService implements TuCacheService {
 
@@ -38,7 +40,9 @@ public class RedisCacheService implements TuCacheService {
     @Override
     public void deleteKeys(String key) {
         Set<String> keys = redisTemplate.keys(key + "*");
-        redisTemplate.delete(keys);
+        if (keys != null) {
+            redisTemplate.delete(keys);
+        }
     }
 
     @Override
@@ -54,11 +58,13 @@ public class RedisCacheService implements TuCacheService {
             redisTemplate.expire(key, expire, timeUnit);
         }
 
-        if (value == null)
+        if (value == null) {
             return null;
+        }
 
-        if (clazz.isPrimitive())
+        if (clazz.isPrimitive()) {
             return (T) value;
+        }
 
         try {
             if (value instanceof Number) {

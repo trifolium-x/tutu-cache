@@ -15,38 +15,49 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.*;
 
 /**
- * Created by wangxudong on 2020/04/09.
+ * 缓存注解的切面实现
  *
- * @version: 1.0
- * @modified :
+ * @author wangxudong
+ * @date 2020/08/28
+ * @see TuCache,TuCacheClear
  */
 @Aspect
-public class TuCacheAspect implements DisposableBean {
+public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFactoryAware {
 
     private final static Logger log = LoggerFactory.getLogger(TuCacheAspect.class);
+
+    private BeanFactory beanFactory;
 
     /**
      * 可缓存的线程池，用于提交异步任务
      */
-    private ExecutorService threadPool = null;
+    private ExecutorService threadPool;
 
+    /**
+     * 需要 tuCacheService 如果没有注入则发生异常
+     */
     private TuCacheService tuCacheService;
 
+    /**
+     * tuCache 的 key 生成器，如果没有注入，则使用默认的生成器
+     */
+    private TuKeyGenerate tuKeyGenerate;
+
+    /**
+     * 设置默认值
+     */
     private TuCacheProfiles tuCacheProfiles = new TuCacheProfiles();
-
-    private TuKeyGenerate tuKeyGenerate = new DefaultTuKeyGenerate();
-
-    public TuCacheAspect() {
-
-        initThreadPool();
-    }
 
     @Around("@annotation(co.tunan.tucache.core.annotation.TuCache)")
     public Object cache(ProceedingJoinPoint pjp) throws Throwable {
@@ -63,7 +74,7 @@ public class TuCacheAspect implements DisposableBean {
             TuCache tuCache = method.getAnnotation(TuCache.class);
 
             if (returnType.equals(void.class)
-                    || !new TuConditionProcess().accept(tuCache.condition(), targetObj, method, args)) {
+                    || !new TuConditionProcess(this.beanFactory).accept(tuCache.condition(), targetObj, method, args)) {
 
                 return pjp.proceed();
             }
@@ -126,7 +137,7 @@ public class TuCacheAspect implements DisposableBean {
             TuCacheClear tuCacheClear = method.getAnnotation(TuCacheClear.class);
             Object[] args = pjp.getArgs();
 
-            if (!new TuConditionProcess().accept(tuCacheClear.condition(), targetObj, method, args)) {
+            if (!new TuConditionProcess(this.beanFactory).accept(tuCacheClear.condition(), targetObj, method, args)) {
 
                 return pjp.proceed();
             }
@@ -167,10 +178,6 @@ public class TuCacheAspect implements DisposableBean {
     public void setTuCacheService(TuCacheService tuCacheService) {
 
         this.tuCacheService = tuCacheService;
-
-        if (tuCacheService == null) {
-            log.warn("TuCacheService at least one implementation, or closed tucache[tucache.enable=false]");
-        }
     }
 
     public void setTuCacheProfiles(TuCacheProfiles tuCacheProfiles) {
@@ -181,29 +188,50 @@ public class TuCacheAspect implements DisposableBean {
         this.tuKeyGenerate = tuKeyGenerate;
     }
 
-    /**
-     * 默认线程池配置，核心线程为CPU核心数，最大线程为CPU核心*4
-     * keepAliveTime 10秒，线程空闲时间超过10秒则关闭，保留核心线程
-     * 队列长度为 Integer.MAX_VALUE
-     */
-    private void initThreadPool() {
-        threadPool = new ThreadPoolExecutor(SystemInfo.MACHINE_CORE_NUM, SystemInfo.MACHINE_CORE_NUM * 4,
-                10L, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(Integer.MAX_VALUE),
-                Executors.defaultThreadFactory(),
-                new ThreadPoolExecutor.AbortPolicy());
+    public void setThreadPool(ExecutorService threadPool) {
+        this.threadPool = threadPool;
     }
 
-    public ExecutorService getThreadPool() {
-        return threadPool;
-    }
+    @Override
+    public void afterPropertiesSet() {
 
+        if (tuCacheService == null) {
+            log.warn("TuCacheService at least one implementation, or closed tu-cache[tucache.enable=false]");
+        }
+        // 如果没有注入tuKeyGenerate 则使用默认的KeyGenerate
+        if (this.tuKeyGenerate == null) {
+            this.tuKeyGenerate = new DefaultTuKeyGenerate(beanFactory);
+        }
+
+        /*
+         * 如果没有注入线程池
+         * 默认线程池配置，核心线程为CPU核心数，最大线程为CPU核心*4
+         * keepAliveTime 10秒，线程空闲时间超过10秒则关闭，保留核心线程
+         * 队列长度为 Integer.MAX_VALUE
+         */
+        if (threadPool == null) {
+            threadPool = new ThreadPoolExecutor(SystemInfo.MACHINE_CORE_NUM, SystemInfo.MACHINE_CORE_NUM * 4,
+                    10L, TimeUnit.SECONDS,
+                    new LinkedBlockingQueue<>(Integer.MAX_VALUE),
+                    Executors.defaultThreadFactory(),
+                    new ThreadPoolExecutor.AbortPolicy());
+        }
+    }
 
     @Override
     public void destroy() {
+        if(this.threadPool != null){
+            this.threadPool.shutdown();
+        }
 
-        this.getThreadPool().shutdown();
-
-        log.info("tucache is destroy");
+        log.info("tu-cache is destroy");
     }
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+
+        this.beanFactory = beanFactory;
+    }
+
+
 }

@@ -17,14 +17,19 @@ import org.springframework.util.StringUtils;
 import java.lang.reflect.Method;
 
 /**
- * Created by wangxudong on 2021/4/15.
+ * tu-cache key default generator
  *
- * @version: 1.0
- * @modified :
+ * @author wangxudong
+ * @date 2020/08/28
  */
-public class DefaultTuKeyGenerate implements TuKeyGenerate, BeanFactoryAware {
+public class DefaultTuKeyGenerate implements TuKeyGenerate {
 
     private BeanFactory beanFactory;
+
+    public DefaultTuKeyGenerate(BeanFactory beanFactory){
+
+        this.beanFactory = beanFactory;
+    }
 
     @Override
     public String generate(TuCacheProfiles profiles, String originKey, Object rootObject, Method method, Object[] arguments) {
@@ -75,10 +80,4 @@ public class DefaultTuKeyGenerate implements TuKeyGenerate, BeanFactoryAware {
         return builder.toString();
     }
 
-
-    @Override
-    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-
-        this.beanFactory = beanFactory;
-    }
 }

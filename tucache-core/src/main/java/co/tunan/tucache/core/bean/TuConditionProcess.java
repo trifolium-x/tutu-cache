@@ -1,8 +1,6 @@
 package co.tunan.tucache.core.bean;
 
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.context.expression.MethodBasedEvaluationContext;
 import org.springframework.core.DefaultParameterNameDiscoverer;
@@ -14,19 +12,24 @@ import org.springframework.util.StringUtils;
 import java.lang.reflect.Method;
 
 /**
- * Created by wangxudong on 2021/6/4.
+ * 对tu-cache condition的支持
  *
- * @version: 1.0
- * @modified :
+ * @author wangxudong
+ * @date 2020/08/28
+ * @see co.tunan.tucache.core.annotation.TuCache,co.tunan.tucache.core.annotation.TuCacheClear
  */
-public class TuConditionProcess implements BeanFactoryAware {
+public class TuConditionProcess {
 
     private BeanFactory beanFactory;
+
+    public TuConditionProcess(BeanFactory beanFactory){
+        this.beanFactory = beanFactory;
+    }
 
     public boolean accept(String conditionStr, Object rootObject, Method method, Object[] arguments) {
 
         if (StringUtils.isEmpty(conditionStr)
-                || conditionStr.equals("true")) {
+                || "true".equals(conditionStr)) {
 
             return true;
         }
@@ -40,10 +43,4 @@ public class TuConditionProcess implements BeanFactoryAware {
         return parser.parseExpression(conditionStr).getValue(context, Boolean.class);
     }
 
-    @Override
-    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-
-        this.beanFactory = beanFactory;
-
-    }
 }

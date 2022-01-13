@@ -1,5 +1,11 @@
 package co.tunan.tucache.core.config;
 
+/**
+ * tu-cache profiles configuration
+ *
+ * @author wangxudong
+ * @date 2020/08/28
+ */
 public class TuCacheProfiles {
 
     /**

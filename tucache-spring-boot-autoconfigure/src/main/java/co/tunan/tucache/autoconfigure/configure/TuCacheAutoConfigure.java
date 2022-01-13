@@ -4,6 +4,8 @@ import co.tunan.tucache.core.aspect.TuCacheAspect;
 import co.tunan.tucache.core.bean.TuKeyGenerate;
 import co.tunan.tucache.core.bean.impl.DefaultTuKeyGenerate;
 import co.tunan.tucache.core.cache.TuCacheService;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
@@ -16,7 +18,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
+ * tu-cache springboot auto configuration
+ *
  * @author wangxudong
+ * @date 2020/08/28
  */
 @Configuration
 @ConditionalOnClass({TuCacheService.class})
@@ -44,9 +49,9 @@ public class TuCacheAutoConfigure {
 
     @Bean
     @ConditionalOnMissingBean(TuKeyGenerate.class)
-    public TuKeyGenerate tuKeyGenerate() {
+    public TuKeyGenerate tuKeyGenerate(BeanFactory beanFactory) {
 
-        return new DefaultTuKeyGenerate();
+        return new DefaultTuKeyGenerate(beanFactory);
     }
 
 }
