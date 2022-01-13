@@ -9,7 +9,7 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
 * 1.0.2.RELEASE
 * 1.0.1.RELEASE
 * 1.0.1 (公测版本)
-* 测试版本 1.0.0(内测) 
+* 1.0.0(内测) 
 ### 引入tutu-cache
 1. 在springBoot中的使用
     * 引入jar依赖包
