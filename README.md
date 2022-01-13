@@ -6,8 +6,8 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
 [![RELEASE](https://img.shields.io/badge/RELEASE-1.0.1.RELEASE-blue)](https://github.com/trifolium-wang/tutu-cache/releases/tag/1.0.1.RELEASE)
 
 ### 版本
-* 发行版本 1.0.2.RELEASE
-* 发行版本 1.0.1.RELEASE
+* 1.0.2.RELEASE
+* 1.0.1.RELEASE
 * 1.0.1 (公测版本)
 * 测试版本 1.0.0(内测) 
 ### 引入tutu-cache
