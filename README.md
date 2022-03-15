@@ -8,8 +8,8 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
 ### 版本
 * 1.0.2.RELEASE
 * 1.0.1.RELEASE
-* 1.0.1 (公测版本)
-* 1.0.0(内测) 
+* 1.0.1
+* 1.0.0
 ### 引入tutu-cache
 1. 在springBoot中的使用
     * 引入jar依赖包
@@ -57,8 +57,6 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
             <property name="tuCacheService" ref="redisCacheService" />
         </bean>
         
-        <tx:annotation-driven proxy-target-class="true"/>
-        <!-- 使用cgLib代理 -->
         <!-- 注意项目中需要引入spring-aop和spring-data-redis的相关依赖 -->
         ```
 ### 使用tu-cache
@@ -170,6 +168,3 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
         return redisTemplate;
     }
     ```
-
-## 友情连接
-[OkHttps 超级优雅的 API 设计，且链式调用，让你顺滑到底！超级轻量，但性能卓越！](https://gitee.com/ejlchina-zhxu/okhttps)
