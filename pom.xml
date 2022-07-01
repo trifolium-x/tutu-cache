@@ -34,6 +34,7 @@
         <module>tucache-core</module>
         <module>tucache-spring-boot-starter</module>
         <module>tucache-spring-boot-autoconfigure</module>
+        <module>example</module>
     </modules>
 
     <packaging>pom</packaging>

@@ -1,0 +1,28 @@
+server:
+  servlet:
+    context-path: /
+  port: 8080
+
+spring:
+  cache:
+    type: redis
+  redis:
+    database: 0
+    host: localhost
+    port: 6379
+    jedis:
+      pool:
+        max-active: 2
+        max-wait: 5000ms
+        min-idle: 0
+        max-idle: 2
+
+logging:
+  level:
+    co.tunan.tucache.example: debug
+  file:
+    name: logs/log.log
+
+tucache:
+  profiles:
+    cache-prefix: "tu_key_test:"
