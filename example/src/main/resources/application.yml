@@ -26,3 +26,5 @@ logging:
 tucache:
   profiles:
     cache-prefix: "tu_key_test:"
+    pool:
+      core-pool-size: 2

@@ -2,6 +2,7 @@ package co.tunan.tucache.example.controller;
 
 import co.tunan.tucache.core.annotation.TuCache;
 import co.tunan.tucache.core.annotation.TuCacheClear;
+import co.tunan.tucache.example.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 为了方便将缓存注解直接放到Controller，实际场景中建议放在Service或者Component中
+ *
  * @title: BaseTestController
  * @author: trifolium.wang
  * @date: 2022/7/1
@@ -70,6 +72,14 @@ public class BaseTestController {
         return System.currentTimeMillis() + param;
     }
 
+    @GetMapping("/bean_test3")
+    @TuCache("bean_obj3:#{#user.name}:#{#user.age}")
+    public String objTest3(@RequestParam User user) {
+
+        log.debug("对象字段作为缓存key");
+        return System.currentTimeMillis() + user.getName() + "," + user.getAge();
+    }
+
     @GetMapping("/condition_test")
     @TuCache(key = "condition_test:#{#param}", condition = "#param.startsWith('a')")
     public String conditionTest(@RequestParam String param) {
@@ -80,7 +90,7 @@ public class BaseTestController {
 
 
     @GetMapping("/clear_all")
-    @TuCacheClear(keys = {"simple", "test_keys", "bean_fun", "condition_test"})
+    @TuCacheClear(keys = {"simple", "test_keys", "bean_fun", "bean_obj3", "condition_test"}, async = true)
     public String clearAll() {
 
         log.debug("清理所有缓存");

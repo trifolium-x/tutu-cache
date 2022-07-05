@@ -7,7 +7,6 @@ import co.tunan.tucache.core.bean.TuKeyGenerate;
 import co.tunan.tucache.core.bean.impl.DefaultTuKeyGenerate;
 import co.tunan.tucache.core.cache.TuCacheService;
 import co.tunan.tucache.core.config.TuCacheProfiles;
-import co.tunan.tucache.core.util.SystemInfo;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
@@ -24,6 +23,7 @@ import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 缓存注解的切面实现
@@ -203,24 +203,19 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
             this.tuKeyGenerate = new DefaultTuKeyGenerate(beanFactory);
         }
 
-        /*
-         * 如果没有注入线程池
-         * 默认线程池配置，核心线程为CPU核心数，最大线程为CPU核心*4
-         * keepAliveTime 10秒，线程空闲时间超过10秒则关闭，保留核心线程
-         * 队列长度为 Integer.MAX_VALUE
-         */
-        if (threadPool == null) {
-            threadPool = new ThreadPoolExecutor(SystemInfo.MACHINE_CORE_NUM, SystemInfo.MACHINE_CORE_NUM * 4,
-                    10L, TimeUnit.SECONDS,
-                    new LinkedBlockingQueue<>(Integer.MAX_VALUE),
-                    Executors.defaultThreadFactory(),
+        if (threadPool == null && tuCacheService != null) {
+            threadPool = new ThreadPoolExecutor(tuCacheProfiles.getPool().getCorePoolSize(),
+                    tuCacheProfiles.getPool().getMaximumPoolSize(),
+                    tuCacheProfiles.getPool().getKeepAliveTime(), TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue<>(tuCacheProfiles.getPool().getMaxQueueSize()),
+                    new NamedThreadFactory(),
                     new ThreadPoolExecutor.AbortPolicy());
         }
     }
 
     @Override
     public void destroy() {
-        if(this.threadPool != null){
+        if (this.threadPool != null) {
             this.threadPool.shutdown();
         }
 
@@ -233,5 +228,22 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
         this.beanFactory = beanFactory;
     }
 
+
+    public static class NamedThreadFactory implements ThreadFactory {
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+
+        @Override
+        public Thread newThread(Runnable r) {
+            final Thread t = new Thread(null, r, "tu-cache-pool-" + threadNumber.getAndIncrement());
+            t.setDaemon(false);
+            //优先级
+            if (Thread.NORM_PRIORITY != t.getPriority()) {
+                // 标准优先级
+                t.setPriority(Thread.NORM_PRIORITY);
+            }
+            return t;
+        }
+
+    }
 
 }
