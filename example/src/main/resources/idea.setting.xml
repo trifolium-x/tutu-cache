@@ -1,0 +1,33 @@
+<LanguageInjectionConfiguration>
+    <injection language="SpEL" injector-id="java">
+        <display-name>TuCache (co.tunan.tucache.core.annotation)</display-name>
+        <value-pattern>\#\{(.*?)\}</value-pattern>
+        <place><![CDATA[psiMethod().withName("key").withParameters().definedInClass("co.tunan.tucache.core.annotation.TuCache")]]></place>
+        <place><![CDATA[psiMethod().withName("value").withParameters().definedInClass("co.tunan.tucache.core.annotation.TuCache")]]></place>
+    </injection>
+    <injection language="SpEL" injector-id="java">
+        <display-name>TuCache.condition (co.tunan.tucache.core.annotation)</display-name>
+        <place><![CDATA[psiMethod().withName("condition").withParameters().definedInClass("co.tunan.tucache.core.annotation.TuCache")]]></place>
+    </injection>
+    <injection language="SpEL" injector-id="java">
+        <display-name>TuCacheClear (co.tunan.tucache.core.annotation)</display-name>
+        <value-pattern>\#\{(.*?)\}</value-pattern>
+        <place disabled="true"><![CDATA[psiMethod().withName("condition").withParameters().definedInClass("org.springframework.cache.annotation.CacheEvict")]]></place>
+        <place disabled="true"><![CDATA[psiMethod().withName("condition").withParameters().definedInClass("org.springframework.cache.annotation.CachePut")]]></place>
+        <place disabled="true"><![CDATA[psiMethod().withName("condition").withParameters().definedInClass("org.springframework.cache.annotation.Cacheable")]]></place>
+        <place disabled="true"><![CDATA[psiMethod().withName("key").withParameters().definedInClass("co.tunan.tucache.core.annotation.TuCache")]]></place>
+        <place><![CDATA[psiMethod().withName("key").withParameters().definedInClass("co.tunan.tucache.core.annotation.TuCacheClear")]]></place>
+        <place disabled="true"><![CDATA[psiMethod().withName("key").withParameters().definedInClass("org.springframework.cache.annotation.CacheEvict")]]></place>
+        <place disabled="true"><![CDATA[psiMethod().withName("key").withParameters().definedInClass("org.springframework.cache.annotation.CachePut")]]></place>
+        <place disabled="true"><![CDATA[psiMethod().withName("key").withParameters().definedInClass("org.springframework.cache.annotation.Cacheable")]]></place>
+        <place><![CDATA[psiMethod().withName("keys").withParameters().definedInClass("co.tunan.tucache.core.annotation.TuCacheClear")]]></place>
+        <place disabled="true"><![CDATA[psiMethod().withName("unless").withParameters().definedInClass("org.springframework.cache.annotation.CachePut")]]></place>
+        <place disabled="true"><![CDATA[psiMethod().withName("unless").withParameters().definedInClass("org.springframework.cache.annotation.Cacheable")]]></place>
+        <place disabled="true"><![CDATA[psiMethod().withName("value").withParameters().definedInClass("co.tunan.tucache.core.annotation.TuCache")]]></place>
+        <place><![CDATA[psiMethod().withName("value").withParameters().definedInClass("co.tunan.tucache.core.annotation.TuCacheClear")]]></place>
+    </injection>
+    <injection language="SpEL" injector-id="java">
+        <display-name>TuCacheClear.condition (co.tunan.tucache.core.annotation)</display-name>
+        <place><![CDATA[psiMethod().withName("condition").withParameters().definedInClass("co.tunan.tucache.core.annotation.TuCacheClear")]]></place>
+    </injection>
+</LanguageInjectionConfiguration>
