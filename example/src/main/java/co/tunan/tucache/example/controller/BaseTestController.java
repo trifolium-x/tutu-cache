@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 为了方便将缓存注解直接放到Controller，实际场景中建议放在Service或者Component中
@@ -101,52 +101,29 @@ public class BaseTestController {
         return "缓存全部清理!";
     }
 
-    @GetMapping("/array_test")
-    @TuCache(key = "array:test")
-    public Integer[] testArray() {
 
-        log.debug("数组类型方法返回值序列化");
-        return new Integer[]{1, 2, 3, 4};
+    @GetMapping("/object_test")
+    @TuCache(key = "object:test")
+    public User testObject() {
+
+        log.debug("测试对象缓存");
+        return new User();
     }
 
-    @GetMapping("/array_test2")
-    @TuCache(key = "array:test2")
-    public User[] testArray2() {
+    @GetMapping("/obj_list_test")
+    @TuCache(key = "obj_list:test")
+    public List<User> testObjectList() {
+
+        log.debug("数组类型方法返回值序列化");
+        return Arrays.asList(testObjectArray());
+    }
+
+    @GetMapping("/obj_array_test")
+    @TuCache(key = "obj_array:test")
+    public User[] testObjectArray() {
 
         log.debug("数组类型方法返回值序列化");
         return new User[]{new User(), new User(), new User(), new User()};
-    }
-
-    @GetMapping("/primitive_test")
-    @TuCache(key = "primitive:test")
-    public long testPrimitive() {
-
-        log.debug("测试基本数据类型");
-        return System.currentTimeMillis();
-    }
-
-    @GetMapping("/primitive_test2")
-    @TuCache(key = "primitive:test2")
-    public Long testPrimitive2() {
-
-        log.debug("测试基本数据类型2");
-        return System.currentTimeMillis();
-    }
-
-    @GetMapping("/test_atomic")
-    @TuCache(key = "test:atomic")
-    public AtomicInteger testAtomic() {
-
-        log.debug("测试atomic");
-        return new AtomicInteger(203);
-    }
-
-    @GetMapping("/test_big_decimal")
-    @TuCache(key = "test:big_decimal")
-    public BigDecimal testBigDecimal() {
-
-        log.debug("测试big_decimal");
-        return new BigDecimal("2934");
     }
 
     @GetMapping("/test_enum")

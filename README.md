@@ -32,7 +32,7 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
       public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
             RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
             redisTemplate.setKeySerializer(new StringRedisSerializer());
-            redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer(createGenericObjectMapper()));
+            redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
             redisTemplate.setConnectionFactory(redisConnectionFactory);
       
             return redisTemplate;
