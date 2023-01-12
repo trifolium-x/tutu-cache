@@ -52,6 +52,7 @@ public class RedisCacheService implements TuCacheService {
 
     @Override
     public <T> T get(String key, Class<T> clazz, long expire, TimeUnit timeUnit) {
+
         Object value = redisTemplate.opsForValue().get(key);
 
         if (expire != NOT_EXPIRE) {
@@ -62,12 +63,8 @@ public class RedisCacheService implements TuCacheService {
             return null;
         }
 
-        if (clazz.isPrimitive()) {
-            return (T) value;
-        }
-
         try {
-            if (value instanceof Number) {
+            if (value instanceof Number || clazz.isEnum()) {
                 Method method = clazz.getMethod("valueOf", String.class);
 
                 return clazz.cast(method.invoke("valueOf", value.toString()));
