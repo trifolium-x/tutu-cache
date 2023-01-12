@@ -19,7 +19,7 @@ spring:
 
 logging:
   level:
-    co.tunan.tucache.example: debug
+    co.tunan.tucache: debug
   file:
     name: logs/log.log
 

@@ -63,8 +63,12 @@ public class RedisCacheService implements TuCacheService {
             return null;
         }
 
+        if (clazz.isArray() || clazz.isPrimitive()) {
+            return (T) value;
+        }
+
         try {
-            if (value instanceof Number || clazz.isEnum()) {
+            if (clazz.isEnum()) {
                 Method method = clazz.getMethod("valueOf", String.class);
 
                 return clazz.cast(method.invoke("valueOf", value.toString()));
@@ -75,7 +79,6 @@ public class RedisCacheService implements TuCacheService {
         }
 
         return clazz.cast(value);
-
     }
 
     public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {

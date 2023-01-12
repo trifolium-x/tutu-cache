@@ -1,10 +1,22 @@
 package co.tunan.tucache.example.configure;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import org.springframework.cache.support.NullValue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.util.TimeZone;
 
 /**
  * @title: TestConfiguration
@@ -24,10 +36,38 @@ public class TestConfiguration {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer(createGenericObjectMapper()));
 
         redisTemplate.setConnectionFactory(redisConnectionFactory);
 
         return redisTemplate;
+    }
+
+    private ObjectMapper createGenericObjectMapper() {
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        objectMapper.setTimeZone(TimeZone.getDefault());
+
+        objectMapper.setDefaultLeniency(Boolean.FALSE);
+
+        objectMapper.registerModule(new SimpleModule().addSerializer(new StdSerializer<NullValue>(NullValue.class) {
+            private String classIdentifier;
+
+            @Override
+            public void serialize(NullValue value, JsonGenerator jgen, SerializerProvider provider)
+                    throws IOException {
+                classIdentifier = StringUtils.hasText(classIdentifier) ? classIdentifier : "@class";
+                jgen.writeStartObject();
+                jgen.writeStringField(classIdentifier, NullValue.class.getName());
+                jgen.writeEndObject();
+            }
+        }));
+
+
+        objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
+                ObjectMapper.DefaultTyping.NON_FINAL);
+
+        return objectMapper;
     }
 
 }
