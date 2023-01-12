@@ -6,6 +6,7 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
 [![RELEASE](https://img.shields.io/badge/RELEASE-1.0.2.RELEASE-blue)](https://github.com/trifolium-wang/tutu-cache/releases/tag/1.0.2.RELEASE)
 
 ### 版本
+* 1.0.3.RELEASE
 * 1.0.2.RELEASE
 * 1.0.1.RELEASE
 * 1.0.1
@@ -17,7 +18,7 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
            <dependency>
                <groupId>co.tunan.tucache</groupId>
                <artifactId>tucache-spring-boot-starter</artifactId>
-               <version>1.0.2.RELEASE</version>
+               <version>1.0.3.RELEASE</version>
            </dependency>
            <dependency>
                <groupId>org.springframework.boot</groupId>
@@ -31,7 +32,7 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
       public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
             RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
             redisTemplate.setKeySerializer(new StringRedisSerializer());
-      
+            redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer(createGenericObjectMapper()));
             redisTemplate.setConnectionFactory(redisConnectionFactory);
       
             return redisTemplate;
@@ -43,7 +44,7 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
         <dependency>
           <groupId>co.tunan.tucache</groupId>
           <artifactId>cache-core</artifactId>
-          <version>1.0.2.RELEASE</version>
+          <version>1.0.3.RELEASE</version>
         </dependency>
         ```
     * 在applicationContent.xml中配置
@@ -127,9 +128,11 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
     * _注意key和keys的区别_
 5. condition 的用法
 
-### 版本对应的spring框架
-* tucache 1.0.1.RELEASE ----- spring 5.1.3.RELEASE+ ----- springBoot版本2.1.1.RELEASE+
-* tucache 1.0.2.RELEASE ----- spring 5.1.3.RELEASE+ ----- springBoot版本2.1.1.RELEASE+
+### 版本对应的spring基础环境版本
+* 建议springBoot版本在2.1.x-2.7.x
+* tucache 1.0.3.RELEASE ----- spring 5.3.15 ----- springBoot版本2.6.3
+* tucache 1.0.2.RELEASE ----- spring 5.1.3.RELEASE ----- springBoot版本2.1.1.RELEASE
+* tucache 1.0.1.RELEASE ----- spring 5.1.3.RELEASE ----- springBoot版本2.1.1.RELEASE
 ### 个性化配置
 * tutu-cache默认提供了 RedisTuCacheService,如果用户使用的缓存是redis并配置了redisTemplate的bean则自动使用该默认缓存服务。
 * 用户使用其他缓存，则需要自定义TuCacheService，实现该接口并注入到TuCacheBean中
