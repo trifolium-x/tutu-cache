@@ -40,7 +40,7 @@ public class TuConditionProcess {
         // 加入使用@符号访问bean能力
         context.setBeanResolver(new BeanFactoryResolver(beanFactory));
 
-        return parser.parseExpression(conditionStr).getValue(context, Boolean.class);
+        return Boolean.TRUE.equals(parser.parseExpression(conditionStr).getValue(context, Boolean.class));
     }
 
 }
