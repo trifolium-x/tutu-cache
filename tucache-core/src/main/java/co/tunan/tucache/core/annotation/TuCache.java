@@ -23,22 +23,21 @@ import java.util.concurrent.TimeUnit;
 public @interface TuCache {
 
     /**
-     * Note on the method, cache the return value of the method, the key is the key of redis, and the value is json
-     * Expire is the cache expiration time, when the cache is re-stored, the cache time will be reset
+     * Annotation on the method, cache the return value of the method
+     * when the cache is re-stored, the cache time will be reset
      * If resetExpire is set to false, if the cache exists in the cache, the data will be updated directly without resetting the time.
-     * condition, resetExpire temporarily unavailable
      * <p>
-     * 注解在方法上，将方法的返回值进行缓存，key为redis的key，值为json
+     * 注解在方法上，将方法的返回值进行缓存
      * expire为缓存过期时间，当缓存重新存入时，则缓存时间会重置
      * 如果设置resetExpire为false的情况下，如果缓存中存在该缓存，则直接更新数据而不会重置时间。
-     * condition, resetExpire 暂时无法使用
+     *
      */
     @AliasFor("key")
     String value() default "";
 
     /**
      * 缓存超时时间
-     * Cache timeout time, in seconds
+     * Cache expire, seconds
      */
     long expire() default -1;
 

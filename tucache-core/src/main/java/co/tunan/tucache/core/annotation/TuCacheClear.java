@@ -19,12 +19,11 @@ import java.lang.annotation.*;
 public @interface TuCacheClear {
 
     /**
-     * delete the corresponding key cache, keys means delete all caches beginning with keys (fuzzy deletion)
+     * delete the corresponding cache, keys means delete all caches beginning with keys (fuzzy deletion)
      * If there is a cache with a key of example:123:keys, when the keys is example:,
      * all caches starting with example: will be deleted
      * key和keys都可以指定多个
      * <p>
-     * condition功能未实现。
      */
     @AliasFor("key")
     String[] value() default {};
