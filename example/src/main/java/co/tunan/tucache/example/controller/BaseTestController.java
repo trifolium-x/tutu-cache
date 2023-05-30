@@ -101,6 +101,14 @@ public class BaseTestController {
         return "缓存全部清理!";
     }
 
+    @GetMapping("/long_test")
+    @TuCache(key = "lang:test", expire = 500)
+    public Long testLong() {
+
+        log.debug("进入testLong缓存方法");
+        return 0L;
+    }
+
 
     @GetMapping("/object_test")
     @TuCache(key = "object:test")
