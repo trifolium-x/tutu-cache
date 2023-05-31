@@ -103,10 +103,10 @@ public class BaseTestController {
 
     @GetMapping("/long_test")
     @TuCache(key = "lang:test", expire = 500)
-    public Long testLong() {
+    public long testLong() {
 
         log.debug("进入testLong缓存方法");
-        return 0L;
+        return 6;
     }
 
 

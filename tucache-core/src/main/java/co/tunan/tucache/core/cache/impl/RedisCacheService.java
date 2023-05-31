@@ -67,6 +67,24 @@ public class RedisCacheService implements TuCacheService {
             return (T) value;
         }
 
+        if (value instanceof Number) {
+            if (clazz == Long.class) {
+                return clazz.cast(((Number) value).longValue());
+            }
+            if (clazz == Integer.class) {
+                return clazz.cast(((Number) value).intValue());
+            }
+            if (clazz == Double.class) {
+                return clazz.cast(((Number) value).doubleValue());
+            }
+            if (clazz == Float.class) {
+                return clazz.cast(((Number) value).floatValue());
+            }
+            if (clazz == Short.class) {
+                return clazz.cast(((Number) value).shortValue());
+            }
+        }
+
         try {
             if (clazz.isEnum()) {
                 Method method = clazz.getMethod("valueOf", String.class);
