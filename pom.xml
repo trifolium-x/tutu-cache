@@ -29,7 +29,7 @@
 
     <groupId>co.tunan.tucache</groupId>
     <artifactId>tutucache</artifactId>
-    <version>1.0.4.RELEASE</version>
+    <version>${revision}</version>
     <modules>
         <module>tucache-core</module>
         <module>tucache-spring-boot-starter</module>
@@ -66,9 +66,10 @@
     </developers>
 
     <properties>
+        <revision>1.0.4.SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>17</java.version>
+        <java.version>8</java.version>
     </properties>
 
 
