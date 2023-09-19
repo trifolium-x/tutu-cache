@@ -17,20 +17,14 @@
 
         <dependency>
             <groupId>co.tunan.tucache</groupId>
-            <artifactId>tucache-core</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>co.tunan.tucache</groupId>
             <artifactId>tucache-spring-boot-autoconfigure</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
     </dependencies>
 
     <build>
-        <finalName>tucache-spring-boot-starter.${project.parent.version}</finalName>
+        <finalName>tucache-spring-boot-starter.${project.version}</finalName>
     </build>
 
 </project>

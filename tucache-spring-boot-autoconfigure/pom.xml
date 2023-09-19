@@ -11,8 +11,8 @@
     <artifactId>tucache-spring-boot-autoconfigure</artifactId>
 
     <properties>
-        <spring.boot.version>2.6.3</spring.boot.version>
-        <spring.data.redis.version>2.6.1</spring.data.redis.version>
+        <spring.boot.version>2.7.15</spring.boot.version>
+        <slf4j.version>1.7.36</slf4j.version>
     </properties>
 
     <dependencies>
@@ -20,21 +20,7 @@
         <dependency>
             <groupId>co.tunan.tucache</groupId>
             <artifactId>tucache-core</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.32</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.32</version>
-            <optional>true</optional>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -47,7 +33,7 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
-            <version>${spring.data.redis.version}</version>
+            <version>${spring.boot.version}</version>
             <optional>true</optional>
         </dependency>
 

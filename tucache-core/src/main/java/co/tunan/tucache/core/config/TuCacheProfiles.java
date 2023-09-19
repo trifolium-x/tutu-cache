@@ -1,6 +1,9 @@
 package co.tunan.tucache.core.config;
 
 import co.tunan.tucache.core.util.SystemInfo;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * tu-cache profiles configuration
@@ -8,6 +11,9 @@ import co.tunan.tucache.core.util.SystemInfo;
  * @author wangxudong
  * @date 2020/08/28
  */
+@Getter
+@Setter
+@ToString
 public class TuCacheProfiles {
 
     /**
@@ -16,36 +22,28 @@ public class TuCacheProfiles {
     private String cachePrefix = "";
 
     /**
+     * 强制指定缓存类型，否则会自动推断缓存组件
+     * 优先级 AUTO => custom > redis > local
+     */
+    private CacheType cacheType = CacheType.AUTO;
+
+    /**
      * 线程池
      */
     private ThreadPool pool = new ThreadPool();
 
-    public String getCachePrefix() {
-        return cachePrefix;
-    }
-
-    public void setCachePrefix(String cachePrefix) {
-        this.cachePrefix = cachePrefix;
-    }
-
-    public ThreadPool getPool() {
-        return pool;
-    }
-
-    public void setPool(ThreadPool pool) {
-        this.pool = pool;
-    }
-
     /**
      * thread pool config
      */
+    @Getter
+    @Setter
     public static class ThreadPool {
 
         /*
          * 如果没有注入线程池
          * 默认线程池配置，核心线程为CPU核心数，最大线程为CPU核心*4
          * keepAliveTime 10秒，线程空闲时间超过10秒则关闭，保留核心线程
-         * 队列长度为 Integer.MAX_VALUE
+         * 队列长度默认为 Integer.MAX_VALUE
          */
 
         private int corePoolSize = SystemInfo.MACHINE_CORE_NUM;
@@ -55,45 +53,13 @@ public class TuCacheProfiles {
         private int maxQueueSize = Integer.MAX_VALUE;
 
         private long keepAliveTime = 10000L;
-
-        public int getMaximumPoolSize() {
-            return maximumPoolSize;
-        }
-
-        public void setMaximumPoolSize(int maximumPoolSize) {
-            this.maximumPoolSize = maximumPoolSize;
-        }
-
-        public int getMaxQueueSize() {
-            return maxQueueSize;
-        }
-
-        public void setMaxQueueSize(int maxQueueSize) {
-            this.maxQueueSize = maxQueueSize;
-        }
-
-        public int getCorePoolSize() {
-            return corePoolSize;
-        }
-
-        public void setCorePoolSize(int corePoolSize) {
-            this.corePoolSize = corePoolSize;
-        }
-
-        public long getKeepAliveTime() {
-            return keepAliveTime;
-        }
-
-        public void setKeepAliveTime(long keepAliveTime) {
-            this.keepAliveTime = keepAliveTime;
-        }
-
     }
 
-    @Override
-    public String toString() {
-
-        return "cachePrefix:" + cachePrefix;
+    public enum CacheType {
+        AUTO,
+        // caffeine = local
+        CAFFEINE,
+        LOCAL,
+        REDIS
     }
-
 }

@@ -11,7 +11,6 @@
 - 修复了redis返序列化Long自动转为Integer的问题
 
 
-
 ## [1.0.3.RELEASE] - 2023-05-30
 
 ### Changed

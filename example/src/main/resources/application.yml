@@ -5,7 +5,7 @@ server:
 
 spring:
   cache:
-    type: redis
+    type: caffeine
   redis:
     database: 0
     host: localhost

@@ -1,6 +1,8 @@
 package co.tunan.tucache.autoconfigure.configure;
 
 import co.tunan.tucache.core.config.TuCacheProfiles;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
@@ -11,10 +13,12 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
  * @date 2020/08/28
  */
 @ConfigurationProperties("tucache")
-public class TuCacheConfigure {
+public class TuCacheProfilesConfigure {
 
     private boolean enabled = true;
 
+    @Getter
+    @Setter
     @NestedConfigurationProperty
     private TuCacheProfiles profiles = new TuCacheProfiles();
 
@@ -24,14 +28,6 @@ public class TuCacheConfigure {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-    }
-
-    public TuCacheProfiles getProfiles() {
-        return profiles;
-    }
-
-    public void setProfiles(TuCacheProfiles profiles) {
-        this.profiles = profiles;
     }
 
     @Override

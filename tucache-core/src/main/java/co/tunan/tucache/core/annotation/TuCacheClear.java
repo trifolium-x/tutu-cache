@@ -1,7 +1,6 @@
 package co.tunan.tucache.core.annotation;
 
 import co.tunan.tucache.core.aspect.TuCacheAspect;
-import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
 
@@ -24,12 +23,12 @@ public @interface TuCacheClear {
      * all caches starting with example: will be deleted
      * key和keys都可以指定多个
      * <p>
+     * Alias for {@link #key()}.
      */
-    @AliasFor("key")
     String[] value() default {};
 
     /**
-     * @see #value
+     * Alias for {@link #value()}.
      */
     String[] key() default {};
 
