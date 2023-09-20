@@ -36,6 +36,11 @@ public @interface TuCache {
     String value() default "";
 
     /**
+     * Alias for {@link #value()}.
+     */
+    String key() default "";
+
+    /**
      * 缓存超时时间
      * Cache expire, seconds
      */
@@ -47,9 +52,10 @@ public @interface TuCache {
     TimeUnit timeUnit() default TimeUnit.SECONDS;
 
     /**
-     * Alias for {@link #value()}.
+     * Write to the cache asynchronously
+     * 使用异步方式写入结果到缓存
      */
-    String key() default "";
+    boolean async() default false;
 
     /**
      * Whether to reset the time every time the cache is hit

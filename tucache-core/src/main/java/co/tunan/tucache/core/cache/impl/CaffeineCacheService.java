@@ -1,6 +1,6 @@
 package co.tunan.tucache.core.cache.impl;
 
-import co.tunan.tucache.core.cache.TuCacheService;
+import co.tunan.tucache.core.cache.AbstractTuCacheService;
 
 import java.util.concurrent.TimeUnit;
 
@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
  * @date: 2023/9/19
  * @modified :
  */
-public class CaffeineCacheService implements TuCacheService {
+public class CaffeineCacheService extends AbstractTuCacheService {
     @Override
     public void set(String key, Object value, long expire, TimeUnit timeUnit) {
 

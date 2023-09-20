@@ -28,3 +28,4 @@ tucache:
     cache-prefix: "tu_key_test:"
     pool:
       core-pool-size: 2
+  cache-type: redis

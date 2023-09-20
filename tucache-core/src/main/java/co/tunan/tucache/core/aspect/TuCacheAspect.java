@@ -113,10 +113,20 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
                 cacheResult = pjp.proceed();
                 try {
                     if (cacheResult != null) {
+                        final Object finaCacheResult = cacheResult;
                         if (tuCache.expire() == -1) {
-                            tuCacheService.set(cacheKey, cacheResult);
+                            if (tuCache.async()) {
+                                threadPool.submit(() -> tuCacheService.set(cacheKey, finaCacheResult));
+                            } else {
+                                tuCacheService.set(cacheKey, cacheResult);
+                            }
                         } else {
-                            tuCacheService.set(cacheKey, cacheResult, tuCache.expire(), tuCache.timeUnit());
+                            if (tuCache.async()) {
+                                threadPool.submit(() -> tuCacheService.set(cacheKey, finaCacheResult, tuCache.expire(),
+                                        tuCache.timeUnit()));
+                            } else {
+                                tuCacheService.set(cacheKey, cacheResult, tuCache.expire(), tuCache.timeUnit());
+                            }
                         }
                     }
                 } catch (Exception e) {

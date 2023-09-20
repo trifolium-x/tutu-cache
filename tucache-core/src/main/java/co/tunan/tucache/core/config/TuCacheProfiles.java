@@ -22,12 +22,6 @@ public class TuCacheProfiles {
     private String cachePrefix = "";
 
     /**
-     * 强制指定缓存类型，否则会自动推断缓存组件
-     * 优先级 AUTO => custom > redis > local
-     */
-    private CacheType cacheType = CacheType.AUTO;
-
-    /**
      * 线程池
      */
     private ThreadPool pool = new ThreadPool();
@@ -46,20 +40,22 @@ public class TuCacheProfiles {
          * 队列长度默认为 Integer.MAX_VALUE
          */
 
+        /**
+         * defaults to core number
+         */
         private int corePoolSize = SystemInfo.MACHINE_CORE_NUM;
 
+        /**
+         * The maximum number of threads defaults to core number 4
+         */
         private int maximumPoolSize = SystemInfo.MACHINE_CORE_NUM * 4;
 
+        /**
+         * The built-in thread pool uses unbounded queues,
+         * automatically expand the number of threads
+         */
         private int maxQueueSize = Integer.MAX_VALUE;
 
         private long keepAliveTime = 10000L;
-    }
-
-    public enum CacheType {
-        AUTO,
-        // caffeine = local
-        CAFFEINE,
-        LOCAL,
-        REDIS
     }
 }

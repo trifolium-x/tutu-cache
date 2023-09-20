@@ -1,6 +1,6 @@
 package co.tunan.tucache.core.cache.impl;
 
-import co.tunan.tucache.core.cache.TuCacheService;
+import co.tunan.tucache.core.cache.AbstractTuCacheService;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.lang.reflect.Method;
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * @author wangxudong
  * @date 2019/3/14
  */
-public class RedisCacheService implements TuCacheService {
+public class RedisCacheService extends AbstractTuCacheService {
 
     private RedisTemplate<String, Object> redisTemplate;
 

@@ -1,16 +1,13 @@
 package co.tunan.tucache.autoconfigure.configure;
 
-import co.tunan.tucache.autoconfigure.configure.cache.CaffeineCacheServiceConfigure;
-import co.tunan.tucache.autoconfigure.configure.cache.LocalCacheServiceConfigure;
-import co.tunan.tucache.autoconfigure.configure.cache.RedisCacheServiceConfigure;
 import co.tunan.tucache.core.aspect.TuCacheAspect;
 import co.tunan.tucache.core.bean.TuKeyGenerate;
 import co.tunan.tucache.core.bean.impl.DefaultTuKeyGenerate;
+import co.tunan.tucache.core.cache.AbstractTuCacheService;
 import co.tunan.tucache.core.cache.TuCacheService;
 import co.tunan.tucache.core.cache.impl.CaffeineCacheService;
 import co.tunan.tucache.core.cache.impl.LocalCacheService;
 import co.tunan.tucache.core.cache.impl.RedisCacheService;
-import co.tunan.tucache.core.config.TuCacheProfiles;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanFactory;
@@ -24,6 +21,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ImportSelector;
+import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.util.Assert;
 
 /**
  * tu-cache springboot auto configuration
@@ -36,8 +36,7 @@ import org.springframework.context.annotation.Import;
 @ConditionalOnClass({TuCacheService.class})
 @AutoConfigureAfter({CacheAutoConfiguration.class})
 @EnableConfigurationProperties(TuCacheProfilesConfigure.class)
-//@Import({TuCacheServiceSelector.class})
-@Import({CaffeineCacheServiceConfigure.class, RedisCacheServiceConfigure.class, LocalCacheServiceConfigure.class})
+@Import({TuCacheAutoConfigure.TuCacheServiceSelector.class})
 @ConditionalOnProperty(prefix = "tucache", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class TuCacheAutoConfigure {
 
@@ -47,8 +46,8 @@ public class TuCacheAutoConfigure {
                                        ObjectProvider<TuCacheService> tuCacheServices,
                                        ObjectProvider<TuKeyGenerate> tuKeyGenerates) {
 
-        TuCacheService tuCacheService = selectTuCacheService(tuCacheServices,
-                tuCacheConfigure.getProfiles().getCacheType());
+        TuCacheService tuCacheService = selectTuCacheService(tuCacheServices, tuCacheConfigure.getCacheType());
+        Assert.notNull(tuCacheService, "tu-cache TuCacheService bean does not exist.");
 
         log.info("tu-cache service: {}", tuCacheService.getClass().getTypeName());
 
@@ -62,17 +61,19 @@ public class TuCacheAutoConfigure {
     }
 
     @Bean
-    @ConditionalOnMissingBean(TuKeyGenerate.class)
+    @ConditionalOnMissingBean
     public TuKeyGenerate tuKeyGenerate(BeanFactory beanFactory) {
 
         return new DefaultTuKeyGenerate(beanFactory);
     }
 
     /**
-     * 按照优先级或者用户配置选择合适的缓存服务
+     * TuCacheService bean选择器
+     * 根据 <custom> > REDIS > CAFFEINE > LOCAL的优先级选用
+     * 如果用户指定了cache-type，但是并没有自动注入相应的缓存组件，则抛出异常。
      */
     private TuCacheService selectTuCacheService(ObjectProvider<TuCacheService> tuCacheServices,
-                                                TuCacheProfiles.CacheType cacheType) {
+                                                TuCacheProfilesConfigure.CacheType cacheType) {
 
         TuCacheService tuCacheService;
 
@@ -80,59 +81,69 @@ public class TuCacheAutoConfigure {
             case CAFFEINE:
                 tuCacheService = tuCacheServices.stream().filter(cs -> cs instanceof CaffeineCacheService)
                         .findFirst().orElseThrow(() -> new BeanCreationException("CaffeineCacheService",
-                                "CaffeineCacheService bean does not exist"));
+                                "CaffeineCacheService bean does not exist, but tucache.cache-type=" + cacheType));
                 break;
             case LOCAL:
                 tuCacheService = tuCacheServices.stream().filter(cs -> cs instanceof LocalCacheService)
                         .findFirst().orElseThrow(() -> new BeanCreationException("LocalCacheService",
-                                "LocalCacheService bean does not exist"));
+                                "LocalCacheService bean does not exist, but tucache.cache-type=" + cacheType));
 
                 break;
             case REDIS:
                 tuCacheService = tuCacheServices.stream().filter(cs -> cs instanceof RedisCacheService)
                         .findFirst().orElseThrow(() -> new BeanCreationException("RedisCacheService",
-                                "RedisCacheService bean does not exist"));
+                                "RedisCacheService bean does not exist, but tucache.cache-type=" + cacheType));
 
                 break;
             default:
-                // 根据 CUSTOM > REDIS > CAFFEINE > LOCAL的优先级选用，
+                // 根据 <custom> > REDIS > CAFFEINE > LOCAL的优先级选用，
                 // 如果有@Primary注解的或者是唯一的TuCacheService则直接选择
                 tuCacheService = tuCacheServices.getIfUnique();
                 if (tuCacheService != null) {
                     break;
                 }
 
-                // 有用户自定义的或者多个缓存组件
-                tuCacheService = tuCacheServices.stream().filter(cs ->
-                                !(cs instanceof RedisCacheService)
-                                        && !(cs instanceof CaffeineCacheService)
-                                        && !(cs instanceof LocalCacheService)).findFirst()
-                        .orElse(null);
-                // 如果是用户自定义，则自定义优先
+                // 户自定义优先选择
+                tuCacheService = tuCacheServices.stream().filter(cs -> !(cs instanceof AbstractTuCacheService))
+                        .findFirst().orElse(null);
                 if (tuCacheService != null) {
                     break;
                 }
 
-                tuCacheService = tuCacheServices.stream().filter(cs -> (cs instanceof RedisCacheService)).findFirst()
-                        .orElse(null);
+                tuCacheService = tuCacheServices.stream().filter(cs -> (cs instanceof RedisCacheService))
+                        .findFirst().orElse(null);
                 if (tuCacheService != null) {
                     break;
                 }
 
-                tuCacheService = tuCacheServices.stream().filter(cs -> (cs instanceof CaffeineCacheService)).findFirst()
-                        .orElse(null);
+                tuCacheService = tuCacheServices.stream().filter(cs -> (cs instanceof CaffeineCacheService))
+                        .findFirst().orElse(null);
                 if (tuCacheService != null) {
                     break;
                 }
 
-                // 下面代码实际上不可触达，不过为了可读性就写上去了
-                tuCacheService = tuCacheServices.stream().filter(cs -> (cs instanceof LocalCacheService)).findFirst()
-                        .orElse(null);
+                tuCacheService = tuCacheServices.stream().filter(cs -> (cs instanceof LocalCacheService))
+                        .findFirst().orElse(null);
                 if (tuCacheService != null) {
                     break;
                 }
         }
 
         return tuCacheService;
+    }
+
+    /**
+     * 注入所有的缓存组件配置Configure
+     * 简化@Import注解
+     */
+    static class TuCacheServiceSelector implements ImportSelector {
+        @Override
+        public String[] selectImports(AnnotationMetadata importingClassMetadata) {
+            return new String[]{
+                    "co.tunan.tucache.autoconfigure.configure.cache.RedisCacheServiceConfigure",
+                    "co.tunan.tucache.autoconfigure.configure.cache.CaffeineCacheServiceConfigure",
+                    "co.tunan.tucache.autoconfigure.configure.cache.LocalCacheServiceConfigure"
+            };
+        }
     }
 }
