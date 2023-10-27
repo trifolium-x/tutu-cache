@@ -3,6 +3,7 @@ package co.tunan.tucache.autoconfigure.configure.cache;
 import co.tunan.tucache.autoconfigure.configure.TuCacheCondition;
 import co.tunan.tucache.core.cache.TuCacheService;
 import co.tunan.tucache.core.cache.impl.CaffeineCacheService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -13,17 +14,15 @@ import org.springframework.context.annotation.Conditional;
  * @date: 2023/9/19
  * @modified :
  */
+@Slf4j
 @Conditional(TuCacheCondition.class)
 @ConditionalOnClass(name = "com.github.benmanes.caffeine.cache.Caffeine")
 public class CaffeineCacheServiceConfigure {
 
-    public CaffeineCacheServiceConfigure(){
-        System.out.println("注入了...CaffeineCacheServiceConfigure");
-    }
-
     @Bean("caffeineTuCacheService")
     public TuCacheService caffeineTuCacheService() {
-        System.out.println("caff");
+
+        log.debug("injected with caffeineTuCacheService");
         return new CaffeineCacheService();
     }
 }

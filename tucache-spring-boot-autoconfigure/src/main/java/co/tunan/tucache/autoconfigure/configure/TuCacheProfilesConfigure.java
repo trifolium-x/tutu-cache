@@ -33,9 +33,8 @@ public class TuCacheProfilesConfigure {
 
     public enum CacheType {
         AUTO,
-        // caffeine = local
+        REDIS,
         CAFFEINE,
-        LOCAL,
-        REDIS
+        LOCAL;
     }
 }
