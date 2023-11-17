@@ -175,5 +175,5 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
 #### QQ 交流群: 76131683
 #### 希望更多的开发者参与
 ![请我喝一杯咖啡](https://camo.githubusercontent.com/c3f856bacd5b09669157ed4774f80fb9d8622dd45ce8fdf2990d3552db99bd27/68747470733a2f2f7777772e6275796d6561636f666665652e636f6d2f6173736574732f696d672f637573746f6d5f696d616765732f6f72616e67655f696d672e706e67)
-* USDT address:`0xE8DF0c045714976c1c67fFc9aBb5538625d5EeDE`
-* network: BNB Smart Chain(BEP20)
+* *USDT address:`0xE8DF0c045714976c1c67fFc9aBb5538625d5EeDE`*
+* *network: BNB Smart Chain(BEP20)*
