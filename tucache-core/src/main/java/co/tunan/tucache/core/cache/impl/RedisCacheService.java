@@ -10,12 +10,16 @@ import java.util.concurrent.TimeUnit;
 /**
  * The default TuCacheService implementation class
  *
- * @author wangxudong
- * @date 2019/3/14
+ * @author: wangxudong
+ * @date: 2019/3/14
  */
 public class RedisCacheService extends AbstractTuCacheService {
 
-    private RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    public RedisCacheService(RedisTemplate<String, Object> redisTemplate){
+        this.redisTemplate = redisTemplate;
+    }
 
     private static final long NOT_EXPIRE = -1;
 
@@ -97,10 +101,6 @@ public class RedisCacheService extends AbstractTuCacheService {
         }
 
         return clazz.cast(value);
-    }
-
-    public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
-        this.redisTemplate = redisTemplate;
     }
 
 }

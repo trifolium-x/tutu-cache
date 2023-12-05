@@ -16,7 +16,6 @@
         <spring.version>5.3.29</spring.version>
         <spring.data.redis.version>2.7.15</spring.data.redis.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <caffeine.version>2.9.3</caffeine.version>
     </properties>
 
     <packaging>jar</packaging>
@@ -46,13 +45,6 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
             <version>${spring.data.redis.version}</version>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-            <version>${caffeine.version}</version>
             <optional>true</optional>
         </dependency>
 

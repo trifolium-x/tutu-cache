@@ -1,6 +1,5 @@
 package co.tunan.tucache.autoconfigure.configure;
 
-import co.tunan.tucache.autoconfigure.configure.cache.CaffeineCacheServiceConfigure;
 import co.tunan.tucache.autoconfigure.configure.cache.LocalCacheServiceConfigure;
 import co.tunan.tucache.autoconfigure.configure.cache.RedisCacheServiceConfigure;
 import org.springframework.boot.autoconfigure.condition.ConditionMessage;
@@ -54,11 +53,6 @@ public class TuCacheCondition extends SpringBootCondition {
         switch (cacheType) {
             case REDIS:
                 if (RedisCacheServiceConfigure.class.getName().equals(sourceClass)) {
-                    outcome = ConditionOutcome.match(msg);
-                }
-                break;
-            case CAFFEINE:
-                if (CaffeineCacheServiceConfigure.class.getName().equals(sourceClass)) {
                     outcome = ConditionOutcome.match(msg);
                 }
                 break;
