@@ -11,21 +11,24 @@ tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
 * 1.0.1.RELEASE
 * 1.0.1
 * 1.0.0
-### Quick Start
+
+### 参考文档
+   [tu-cache文档](https://doc.tucache.tunan.co/)
+### 🥳Quick Start
 1. 在springBoot中的使用
     * 引入jar依赖包
-        ```xml
-           <dependency>
-               <groupId>co.tunan.tucache</groupId>
-               <artifactId>tucache-spring-boot-starter</artifactId>
-               <version>1.0.3.RELEASE</version>
-           </dependency>
-           <dependency>
-               <groupId>org.springframework.boot</groupId>
-               <artifactId>spring-boot-starter-data-redis</artifactId>
-           </dependency>
-           <!-- 或者其他缓存 -->
-        ```
+      ```xml
+        <dependency>
+            <groupId>co.tunan.tucache</groupId>
+            <artifactId>tucache-spring-boot-starter</artifactId>
+            <version>1.0.3.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <!-- 或者其他缓存 -->
+      ```
     * 在Configure类中注册javaBean redisTemplate或者使用默认的redisTemplate，必须开启aspectj的aop功能(默认是开启的)
       ```java
       @Bean(name = "redisTemplate")
@@ -127,13 +130,16 @@ tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
         ```
     * _注意key和keys的区别_
 5. condition 的用法
+    * condition要求spEL返回一个boolean类型的值，例如：
+      * condition = "#param.startsWith('a')"
+      * condition = "false"
 
 ### 版本对应的spring基础环境版本
 * 建议springBoot版本在2.1.x-2.7.x
 * tucache 1.0.3.RELEASE ----- spring 5.3.15 ----- springBoot版本2.6.3
 * tucache 1.0.2.RELEASE ----- spring 5.1.3.RELEASE ----- springBoot版本2.1.1.RELEASE
 * tucache 1.0.1.RELEASE ----- spring 5.1.3.RELEASE ----- springBoot版本2.1.1.RELEASE
-### 个性化配置
+### 个性化设置
 * tutu-cache默认提供了 RedisTuCacheService,如果用户使用的缓存是redis并配置了redisTemplate的bean则自动使用该默认缓存服务。
 * 用户使用其他缓存，则需要自定义TuCacheService，实现该接口并注入到TuCacheBean中
 * 在SpringBoot中在Configure类中配置相应的bean自动使用自定义的bean
