@@ -42,7 +42,7 @@
 
     <name>tutu-cache</name>
     <url>https://github.com/trifolium-wang/tutu-cache.git</url>
-    <description>tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的SpringAop项目</description>
+    <description>tutu-cache 是一个简单易用的Spring缓存注解</description>
 
     <licenses>
         <license>
@@ -59,8 +59,8 @@
 
     <developers>
         <developer>
-            <name>Trifolium wang</name>
-            <email>trifolium.wang@foxmail.com</email>
+            <name>trifolium wang</name>
+            <email>trifolium.wang@gmail.com</email>
             <organization>QQ Group 76131683</organization>
         </developer>
     </developers>
@@ -70,13 +70,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>8</java.version>
+        <lombok.version>1.18.24</lombok.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

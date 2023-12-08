@@ -15,9 +15,9 @@ public interface TuCacheService {
     /**
      * add cache and set time
      *
-     * @param expire 超时时间
+     * @param timeout 超时时间
      */
-    void set(String key, Object value, long expire, TimeUnit timeUnit);
+    void set(String key, Object value, long timeout, TimeUnit timeUnit);
 
     /**
      * add cache
@@ -32,7 +32,7 @@ public interface TuCacheService {
     /**
      * get the data in the buffer and set time
      */
-    <T> T get(String key, Class<T> clazz, long expire, TimeUnit timeUnit);
+    <T> T get(String key, Class<T> clazz, long timeout, TimeUnit timeUnit);
 
     /**
      * delete cache

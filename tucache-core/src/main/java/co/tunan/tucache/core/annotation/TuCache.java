@@ -43,8 +43,20 @@ public @interface TuCache {
     /**
      * 缓存超时时间
      * Cache expire, seconds
+     * Alias for {@link #timeout()}.
+     * @see #timeout()
+     * @deprecated {@link #timeout()}
      */
+    @Deprecated
     long expire() default -1;
+
+    /**
+     * 缓存超时时间
+     * Alias for {@link #expire()}.
+     * Cache timeout, in seconds.
+     * default value is permanent (-1)
+     */
+    long timeout() default -1;
 
     /**
      * 时间单位，默认为秒

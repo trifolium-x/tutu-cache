@@ -7,6 +7,7 @@ import co.tunan.tucache.core.bean.TuKeyGenerate;
 import co.tunan.tucache.core.bean.impl.DefaultTuKeyGenerate;
 import co.tunan.tucache.core.cache.TuCacheService;
 import co.tunan.tucache.core.config.TuCacheProfiles;
+import co.tunan.tucache.core.pool.GlobalThreadPool;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -22,14 +23,9 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 缓存注解的切面实现
+ * aop implementation of cache annotations
  *
  * @author wangxudong
  * @date 2020/08/28
@@ -40,12 +36,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFactoryAware {
 
     private BeanFactory beanFactory;
-
-    /**
-     * 可缓存的线程池，用于提交异步任务
-     */
-    @Setter
-    private ThreadPoolExecutor threadPool;
 
     /**
      * 需要 tuCacheService 如果没有注入则发生异常
@@ -91,11 +81,13 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
 
             Object cacheResult;
 
+            long timeout = tuCache.timeout() == -1 ? (tuCache.expire() == -1 ? -1 : tuCache.expire())
+                    : tuCache.timeout();
             // 从缓存中获取数据，如果出错，则直接返回方法处理
             try {
                 if (tuCache.resetExpire()) {
                     // Get data and reset the expiration time
-                    cacheResult = tuCacheService.get(cacheKey, returnType, tuCache.expire(), tuCache.timeUnit());
+                    cacheResult = tuCacheService.get(cacheKey, returnType, timeout, tuCache.timeUnit());
                 } else {
                     cacheResult = tuCacheService.get(cacheKey, returnType);
                 }
@@ -114,18 +106,18 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
                 try {
                     if (cacheResult != null) {
                         final Object finaCacheResult = cacheResult;
-                        if (tuCache.expire() == -1) {
+                        if (timeout == -1) {
                             if (tuCache.async()) {
-                                threadPool.submit(() -> tuCacheService.set(cacheKey, finaCacheResult));
+                                GlobalThreadPool.submit(() -> tuCacheService.set(cacheKey, finaCacheResult));
                             } else {
                                 tuCacheService.set(cacheKey, cacheResult);
                             }
                         } else {
                             if (tuCache.async()) {
-                                threadPool.submit(() -> tuCacheService.set(cacheKey, finaCacheResult, tuCache.expire(),
+                                GlobalThreadPool.submit(() -> tuCacheService.set(cacheKey, finaCacheResult, timeout,
                                         tuCache.timeUnit()));
                             } else {
-                                tuCacheService.set(cacheKey, cacheResult, tuCache.expire(), tuCache.timeUnit());
+                                tuCacheService.set(cacheKey, cacheResult, timeout, tuCache.timeUnit());
                             }
                         }
                     }
@@ -166,7 +158,7 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
                 for (String item : key) {
                     String cKey = tuKeyGenerate.generate(tuCacheProfiles, item, targetObj, method, args);
                     if (tuCacheClear.async()) {
-                        threadPool.submit(() -> tuCacheService.delete(cKey));
+                        GlobalThreadPool.submit(() -> tuCacheService.delete(cKey));
                     } else {
                         tuCacheService.delete(cKey);
                     }
@@ -174,7 +166,7 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
                 for (String item : keys) {
                     String cKey = tuKeyGenerate.generate(tuCacheProfiles, item, targetObj, method, args);
                     if (tuCacheClear.async()) {
-                        threadPool.submit(() -> tuCacheService.deleteKeys(cKey));
+                        GlobalThreadPool.submit(() -> tuCacheService.deleteKeys(cKey));
                     } else {
                         tuCacheService.deleteKeys(cKey);
                     }
@@ -199,51 +191,14 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
             this.tuKeyGenerate = new DefaultTuKeyGenerate(beanFactory);
         }
 
-        if (threadPool == null && tuCacheService != null) {
-            threadPool = new ThreadPoolExecutor(tuCacheProfiles.getPool().getCorePoolSize(),
-                    tuCacheProfiles.getPool().getMaximumPoolSize(),
-                    tuCacheProfiles.getPool().getKeepAliveTime(), TimeUnit.MILLISECONDS,
-                    new LinkedBlockingDeque<Runnable>(tuCacheProfiles.getPool().getMaxQueueSize()) {
-                        @Override
-                        public boolean offer(Runnable e) {
-                            // 策略选择为，如果没有达到最大线程数量，且当队列积压任务超过了最大线程数则增加一个新工作线程
-                            if (threadPool.getActiveCount() < tuCacheProfiles.getPool().getMaximumPoolSize()
-                                    && this.size() >= tuCacheProfiles.getPool().getMaximumPoolSize()) {
-                                return false;
-                            }
-
-                            return offerLast(e);
-                        }
-                    },
-                    new ThreadFactory() {
-                        private final AtomicInteger threadNumber = new AtomicInteger(1);
-
-                        @Override
-                        public Thread newThread(Runnable r) {
-                            final Thread t = new Thread(null, r, "tu-cache-pool-" + threadNumber.getAndIncrement());
-                            t.setDaemon(false);
-                            //优先级
-                            if (Thread.NORM_PRIORITY != t.getPriority()) {
-                                // 标准优先级
-                                t.setPriority(Thread.NORM_PRIORITY);
-                            }
-                            return t;
-                        }
-
-                    },
-                    (r, executor) -> {
-                        log.error("tu-cache thread pool is full.");
-                        new ThreadPoolExecutor.AbortPolicy().rejectedExecution(r, executor);
-                    });
+        if (tuCacheService != null) {
+            GlobalThreadPool.init(tuCacheProfiles);
         }
     }
 
     @Override
     public void destroy() {
-        if (this.threadPool != null) {
-            this.threadPool.shutdown();
-        }
-
+        GlobalThreadPool.shutdown();
         log.info("tu-cache is destroy");
     }
 

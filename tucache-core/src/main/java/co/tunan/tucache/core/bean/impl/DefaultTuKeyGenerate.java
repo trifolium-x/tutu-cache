@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
  */
 public class DefaultTuKeyGenerate implements TuKeyGenerate {
 
-    private BeanFactory beanFactory;
+    private final BeanFactory beanFactory;
 
     public DefaultTuKeyGenerate(BeanFactory beanFactory){
 
@@ -35,7 +35,7 @@ public class DefaultTuKeyGenerate implements TuKeyGenerate {
     public String generate(TuCacheProfiles profiles, String originKey, Object rootObject, Method method, Object[] arguments) {
 
         // SpEL表达式为空默认返回方法名
-        if (StringUtils.isEmpty(originKey)) {
+        if (StringUtils.hasLength(originKey)) {
             // 生成默认的key
             return defaultKey(method, arguments);
         }

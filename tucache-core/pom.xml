@@ -16,6 +16,8 @@
         <spring.version>5.3.29</spring.version>
         <spring.data.redis.version>2.7.15</spring.data.redis.version>
         <slf4j.version>1.7.36</slf4j.version>
+        <junit.version>4.12</junit.version>
+        <aspectjweaver.versions>1.9.7</aspectjweaver.versions>
     </properties>
 
     <packaging>jar</packaging>
@@ -38,7 +40,7 @@
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-            <version>1.9.7</version>
+            <version>${aspectjweaver.versions}</version>
         </dependency>
 
         <dependency>
@@ -46,6 +48,19 @@
             <artifactId>spring-data-redis</artifactId>
             <version>${spring.data.redis.version}</version>
             <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

@@ -1,17 +1,17 @@
-tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的SpringAop项目。
+tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
 使用tutu-cache注解来代替@Cacheable和@CacheEvict等注解
 
 [![GitHub license](https://img.shields.io/github/license/trifolium-wang/tutu-cache)](https://github.com/trifolium-wang/tutu-cache/blob/master/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/trifolium-wang/tutu-cache)](https://github.com/trifolium-wang/tutu-cache/issues)
 [![RELEASE](https://img.shields.io/badge/RELEASE-1.0.3.RELEASE-blue)](https://github.com/trifolium-wang/tutu-cache/releases/tag/1.0.3.RELEASE)
 
-### 版本
+### Version
 * 1.0.3.RELEASE
 * 1.0.2.RELEASE
 * 1.0.1.RELEASE
 * 1.0.1
 * 1.0.0
-### 引入tutu-cache
+### Quick Start
 1. 在springBoot中的使用
     * 引入jar依赖包
         ```xml
@@ -142,14 +142,18 @@ tutu-cache 是为了解决SpringCache缓存注解不够灵活的问题而做的S
     ```yaml
     tucache:
       enabled: true
+      cache-type: redis
       profiles:
         cache-prefix: "my_tu_key_test:"
+        # ...
     ```
 * springMVC中注入到TuCacheBean
     ```xml
     <bean id="tuCacheProfiles" class="co.tunan.tucache.core.config.TuCacheProfiles">
         <property name="cachePrefix" value="test_tucache_prefixkey:" />
     </bean>
+    ```
+    ```xml
     <bean id="tuCacheBean" class="co.tunan.tucache.core.aspect.TuCacheAspect">
         <property name="tuCacheService" ref="redisCacheService" />
         <property name="tuCacheProfiles" ref="tuCacheProfiles" />

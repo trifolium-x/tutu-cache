@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
  */
 public class TuConditionProcess {
 
-    private BeanFactory beanFactory;
+    private final BeanFactory beanFactory;
 
     public TuConditionProcess(BeanFactory beanFactory){
         this.beanFactory = beanFactory;
@@ -28,8 +28,7 @@ public class TuConditionProcess {
 
     public boolean accept(String conditionStr, Object rootObject, Method method, Object[] arguments) {
 
-        if (StringUtils.isEmpty(conditionStr)
-                || "true".equals(conditionStr)) {
+        if (StringUtils.hasLength(conditionStr) || "true".equals(conditionStr)) {
 
             return true;
         }

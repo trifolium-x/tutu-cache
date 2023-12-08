@@ -3,7 +3,6 @@ package co.tunan.tucache.core.cache.impl;
 import co.tunan.tucache.core.cache.AbstractTuCacheService;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -17,7 +16,7 @@ public class RedisCacheService extends AbstractTuCacheService {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public RedisCacheService(RedisTemplate<String, Object> redisTemplate){
+    public RedisCacheService(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
@@ -43,7 +42,11 @@ public class RedisCacheService extends AbstractTuCacheService {
 
     @Override
     public void deleteKeys(String key) {
-        Set<String> keys = redisTemplate.keys(key + "*");
+        String k = key;
+        if (!key.endsWith("*")) {
+            k = key + "*";
+        }
+        Set<String> keys = redisTemplate.keys(k);
         if (keys != null) {
             redisTemplate.delete(keys);
         }
@@ -51,7 +54,8 @@ public class RedisCacheService extends AbstractTuCacheService {
 
     @Override
     public <T> T get(String key, Class<T> clazz) {
-        return get(key, clazz, NOT_EXPIRE, null);
+
+        return objectConvertBean(redisTemplate.opsForValue().get(key), clazz);
     }
 
     @Override
@@ -59,48 +63,9 @@ public class RedisCacheService extends AbstractTuCacheService {
 
         Object value = redisTemplate.opsForValue().get(key);
 
-        if (expire != NOT_EXPIRE) {
-            redisTemplate.expire(key, expire, timeUnit);
-        }
+        redisTemplate.expire(key, expire, timeUnit);
 
-        if (value == null) {
-            return null;
-        }
-
-        if (clazz.isArray() || clazz.isPrimitive()) {
-            return (T) value;
-        }
-
-        if (value instanceof Number) {
-            if (clazz == Long.class) {
-                return clazz.cast(((Number) value).longValue());
-            }
-            if (clazz == Integer.class) {
-                return clazz.cast(((Number) value).intValue());
-            }
-            if (clazz == Double.class) {
-                return clazz.cast(((Number) value).doubleValue());
-            }
-            if (clazz == Float.class) {
-                return clazz.cast(((Number) value).floatValue());
-            }
-            if (clazz == Short.class) {
-                return clazz.cast(((Number) value).shortValue());
-            }
-        }
-
-        try {
-            if (clazz.isEnum()) {
-                Method method = clazz.getMethod("valueOf", String.class);
-
-                return clazz.cast(method.invoke("valueOf", value.toString()));
-            }
-        } catch (Exception e) {
-
-            throw new RuntimeException(e.getMessage(), e);
-        }
-
-        return clazz.cast(value);
+        return objectConvertBean(value, clazz);
     }
 
 }
