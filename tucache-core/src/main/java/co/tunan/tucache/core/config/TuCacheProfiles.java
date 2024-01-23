@@ -43,19 +43,16 @@ public class TuCacheProfiles {
         /**
          * defaults to core number
          * <p>
-         *     Ready-to-use threads prepared by default in the silent state.
+         * Ready-to-use threads prepared by default in the silent state.
          * </p>
          */
-        private int corePoolSize = SystemInfo.MACHINE_CORE_NUM;
+        private int coreThreadNum = SystemInfo.MACHINE_CORE_NUM;
 
         /**
-         * The maximum number of threads defaults to core number 4
-         * <p>
-         *     The maximum number of threads here is literally the maximum number of threads,
-         *     unlike the maximum number of threads in the thread pool as it is commonly understood.
-         * </p>
+         * The maximum number of threads defaults to min number * 4
+         * the minimum value is coreThreadNum
          */
-        private int maximumPoolSize = SystemInfo.MACHINE_CORE_NUM * 4;
+        private int maxThreadNum = SystemInfo.MACHINE_CORE_NUM * 4;
 
         private long keepAliveTime = 10000L;
     }

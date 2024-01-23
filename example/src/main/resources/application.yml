@@ -27,5 +27,5 @@ tucache:
   profiles:
     cache-prefix: "prefix_key_test:"
     pool:
-      core-pool-size: 2
+      core-thread-num: 2
   cache-type: redis

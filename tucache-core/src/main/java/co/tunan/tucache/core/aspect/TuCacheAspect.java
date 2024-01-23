@@ -7,7 +7,7 @@ import co.tunan.tucache.core.bean.TuKeyGenerate;
 import co.tunan.tucache.core.bean.impl.DefaultTuKeyGenerate;
 import co.tunan.tucache.core.cache.TuCacheService;
 import co.tunan.tucache.core.config.TuCacheProfiles;
-import co.tunan.tucache.core.pool.GlobalThreadPool;
+import co.tunan.tucache.core.pool.TucacheDefaultThreadPool;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -23,6 +23,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.ExecutorService;
 
 /**
  * aop implementation of cache annotations
@@ -54,6 +55,12 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
      */
     @Setter
     private TuCacheProfiles tuCacheProfiles = new TuCacheProfiles();
+
+    /**
+     * 异步处理的线程池  synchronous
+     */
+    @Setter
+    private ExecutorService syncExecutorService;
 
     @Around("@annotation(co.tunan.tucache.core.annotation.TuCache)")
     public Object cache(ProceedingJoinPoint pjp) throws Throwable {
@@ -108,14 +115,14 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
                         final Object finaCacheResult = cacheResult;
                         if (timeout == -1) {
                             if (tuCache.async()) {
-                                GlobalThreadPool.submit(() -> tuCacheService.set(cacheKey, finaCacheResult));
+                                syncExecutorService.execute(() -> tuCacheService.set(cacheKey, finaCacheResult));
                             } else {
                                 tuCacheService.set(cacheKey, cacheResult);
                             }
                         } else {
                             if (tuCache.async()) {
-                                GlobalThreadPool.submit(() -> tuCacheService.set(cacheKey, finaCacheResult, timeout,
-                                        tuCache.timeUnit()));
+                                syncExecutorService.execute(() -> tuCacheService.set(cacheKey, finaCacheResult,
+                                        timeout, tuCache.timeUnit()));
                             } else {
                                 tuCacheService.set(cacheKey, cacheResult, timeout, tuCache.timeUnit());
                             }
@@ -158,7 +165,7 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
                 for (String item : key) {
                     String cKey = tuKeyGenerate.generate(tuCacheProfiles, item, targetObj, method, args);
                     if (tuCacheClear.async()) {
-                        GlobalThreadPool.submit(() -> tuCacheService.delete(cKey));
+                        syncExecutorService.execute(() -> tuCacheService.delete(cKey));
                     } else {
                         tuCacheService.delete(cKey);
                     }
@@ -166,7 +173,7 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
                 for (String item : keys) {
                     String cKey = tuKeyGenerate.generate(tuCacheProfiles, item, targetObj, method, args);
                     if (tuCacheClear.async()) {
-                        GlobalThreadPool.submit(() -> tuCacheService.deleteKeys(cKey));
+                        syncExecutorService.execute(() -> tuCacheService.deleteKeys(cKey));
                     } else {
                         tuCacheService.deleteKeys(cKey);
                     }
@@ -192,14 +199,19 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
         }
 
         if (tuCacheService != null) {
-            GlobalThreadPool.init(tuCacheProfiles);
+            if (syncExecutorService == null) {
+                syncExecutorService = TucacheDefaultThreadPool.getInstance(tuCacheProfiles).getPool();
+            }
+
         }
     }
 
     @Override
     public void destroy() {
-        GlobalThreadPool.shutdown();
-        log.info("tu-cache is destroy");
+        if (syncExecutorService != null && !syncExecutorService.isShutdown()) {
+            syncExecutorService.shutdownNow();
+            log.info("tu-cache is destroy");
+        }
     }
 
     @Override

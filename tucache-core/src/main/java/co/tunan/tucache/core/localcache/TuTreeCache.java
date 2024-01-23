@@ -2,10 +2,13 @@ package co.tunan.tucache.core.localcache;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 一个基于 ConcurrentHashMap 的本地缓存，可以按照层级模糊删除
@@ -16,36 +19,53 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date: 2023/12/8
  * @modified:
  */
+@Slf4j
 public class TuTreeCache {
 
     public static final long NOT_EXPIRE = -1;
-    private final CacheTable cacheTable = new CacheTable();
+    private final CacheTable cacheTable;
+
+    /**
+     * 缓存键分隔符
+     */
     private final String DELIMITER;
 
     public TuTreeCache() {
         this.DELIMITER = ":";
+        cacheTable = new CacheTable();
         init();
     }
 
     public TuTreeCache(String delimiter) {
         this.DELIMITER = delimiter;
+        cacheTable = new CacheTable();
         init();
     }
 
     private void init() {
-        // 启动一个主动清理过期缓存的线程
-//        GlobalThreadPool.submit(() -> {
-//            long sleepMillisSecond = 1000L;
-//            for (; ; ) {
-//                try {
-//                    TimeUnit.MILLISECONDS.sleep(sleepMillisSecond);
-//                } catch (InterruptedException e) {
-//                    log.trace(e.getMessage());
-//                }
-//                // TODO 递归的进行清理
-//                cacheTable.keySet();
-//            }
-//        });
+
+        // 启动一个全局主动清理过期缓存的线程
+        // 实际上在缓存使用的过程中沿路径的过期缓存都会被清理掉，
+        // 但有一些路径可能或者永久不会被扫描到，
+        // 这里的全局扫描就是解决这个内存泄漏问题的。
+        // 递归扫描进行清理
+        Thread scanRemove = new Thread(() -> {
+            long sleepMillisSecond = 5000L;
+            for (; ; ) {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(sleepMillisSecond);
+                    // 递归扫描进行清理
+                    scanRemove(cacheTable);
+                } catch (InterruptedException e) {
+                    log.trace(e.getMessage(), e);
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        });
+        scanRemove.setDaemon(false);
+        scanRemove.setName("tu_tree_cache-local-scan-clean");
+        scanRemove.start();
     }
 
     /**
@@ -71,7 +91,7 @@ public class TuTreeCache {
             }
 
             // 过期的情况下,清理当前路径下的节点
-            if (expired(currentNode.getExpire())) {
+            if (currentNode.isExpired()) {
                 if (currentNode.getChild() == null || currentNode.getChild().isEmpty()) {
                     // 过期的缓存
                     currentHierarchy.remove(currentKey);
@@ -118,7 +138,7 @@ public class TuTreeCache {
                 } else {
                     // 存在的话则清除路径上的过期数据
                     // 过期的情况下,清理当前路径下的节点数据，但是其他的保留
-                    if (expired(currentNode.getExpire())) {
+                    if (currentNode.isExpired()) {
                         currentNode.setObj(null);
                         currentNode.setExpire(-1);
                     }
@@ -177,7 +197,7 @@ public class TuTreeCache {
                 currentNode.setExpire(-1);
             } else {
                 // 如果是中间节点且已过期，清理节点
-                if (expired(currentNode.getExpire())) {
+                if (currentNode.isExpired()) {
                     // 如果是中间节点
                     if (currentNode.getChild() == null || currentNode.getChild().isEmpty()) {
                         currentHierarchy.remove(currentKey);
@@ -218,7 +238,7 @@ public class TuTreeCache {
             }
 
             // 如果是中间节点且已过期，清理节点
-            if (expired(currentNode.getExpire())) {
+            if (currentNode.isExpired()) {
                 // 如果是中间节点
                 if (currentNode.getChild() == null || currentNode.getChild().isEmpty()) {
                     currentHierarchy.remove(currentKey);
@@ -234,12 +254,25 @@ public class TuTreeCache {
     }
 
     /**
-     * 是否过期
+     * 递归扫描过期的缓存并清除。
      */
-    private boolean expired(long expire) {
-
-        return expire >= 0 && expire <= System.currentTimeMillis();
+    private void scanRemove(CacheTable ct) {
+        if (ct == null || ct.isEmpty()) return;
+        Iterator<Map.Entry<String, CacheNode>> iterator = ct.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, CacheNode> entry = iterator.next();
+            scanRemove(entry.getValue().getChild());
+            if (entry.getValue().isExpired()) {
+                if (entry.getValue().getChild() == null || entry.getValue().getChild().isEmpty()) {
+                    iterator.remove();
+                } else {
+                    entry.getValue().setObj(null);
+                    entry.getValue().setExpire(-1);
+                }
+            }
+        }
     }
+
 
     /**
      * 缓存数据节点
@@ -250,27 +283,20 @@ public class TuTreeCache {
         private long expire;
         private CacheTable child;
         private Object obj;
+
+        /**
+         * 是否过期
+         */
+        public boolean isExpired() {
+
+            return this.expire >= 0 && this.expire <= System.currentTimeMillis();
+        }
     }
 
-    static class CacheTable {
-        private final Map<String, CacheNode> table = new ConcurrentHashMap<>(36);
-        // 清除和标记
+    /**
+     * 缓存表，就是一个ConcurrentHashMap
+     */
+    static class CacheTable extends ConcurrentHashMap<String, CacheNode> {
 
-
-        public void remove(String key) {
-            table.remove(key);
-        }
-
-        public void put(String key, CacheNode value) {
-            table.put(key, value);
-        }
-
-        public CacheNode get(String key) {
-            return table.get(key);
-        }
-
-        public boolean isEmpty() {
-            return table.isEmpty();
-        }
     }
 }
