@@ -28,4 +28,4 @@ tucache:
     cache-prefix: "prefix_key_test:"
     pool:
       core-thread-num: 2
-  cache-type: redis
+  cache-type: local

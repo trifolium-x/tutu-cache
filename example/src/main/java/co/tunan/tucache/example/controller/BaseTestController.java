@@ -29,7 +29,7 @@ public class BaseTestController {
     private static final Logger log = LoggerFactory.getLogger(BaseTestController.class);
 
     @GetMapping("/simple_cache")
-    @TuCache(key = "simple:#{#param}", expire = 500)
+    @TuCache(key = "simple:#{#param}", timeout = 10)
     public String cacheSimple(@RequestParam String param) {
 
         log.debug("进入simple缓存方法");
@@ -45,7 +45,7 @@ public class BaseTestController {
     }
 
     @GetMapping("/keys_cache")
-    @TuCache("test_keys:#{#param1}:#{#param2}")
+    @TuCache(value = "test_keys:#{#param1}:#{#param2}")
     public String keysCache(@RequestParam String param1, String param2) {
 
         log.debug("加入{}:{}cache", param1, param2);
@@ -102,7 +102,7 @@ public class BaseTestController {
     }
 
     @GetMapping("/long_test")
-    @TuCache(key = "lang:test", expire = 500)
+    @TuCache(key = "lang:test", timeout = 5)
     public long testLong() {
 
         log.debug("进入testLong缓存方法");
@@ -141,7 +141,6 @@ public class BaseTestController {
         log.debug("测试枚举");
         return TestEnum.N1;
     }
-
 
     public String thisFun() {
 

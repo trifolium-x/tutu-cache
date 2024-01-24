@@ -64,10 +64,8 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
 
     @Around("@annotation(co.tunan.tucache.core.annotation.TuCache)")
     public Object cache(ProceedingJoinPoint pjp) throws Throwable {
-        log.debug("tu-cache caching");
-
         if (tuCacheService != null) {
-
+            log.debug("tu-cache caching");
             Object targetObj = pjp.getTarget();
             Signature signature = pjp.getSignature();
             MethodSignature methodSignature = (MethodSignature) signature;
@@ -82,7 +80,7 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
                 return pjp.proceed();
             }
 
-            String spElKey = StringUtils.hasLength(tuCache.key()) ? tuCache.value() : tuCache.key();
+            String spElKey = StringUtils.hasLength(tuCache.key()) ? tuCache.key() : tuCache.value();
 
             String cacheKey = tuKeyGenerate.generate(tuCacheProfiles, spElKey, targetObj, method, args);
 
@@ -142,10 +140,12 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
 
     @Around("@annotation(co.tunan.tucache.core.annotation.TuCacheClear)")
     public Object clear(ProceedingJoinPoint pjp) throws Throwable {
-        log.debug("tu-cache clear.");
-        if (tuCacheService != null) {
-            Object targetObj = pjp.getTarget();
 
+        if (tuCacheService != null) {
+
+            log.debug("tu-cache clear.");
+
+            Object targetObj = pjp.getTarget();
             Signature signature = pjp.getSignature();
             MethodSignature methodSignature = (MethodSignature) signature;
             Method method = methodSignature.getMethod();
