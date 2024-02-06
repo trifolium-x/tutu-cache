@@ -3,9 +3,10 @@ tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
 
 [![GitHub license](https://img.shields.io/github/license/trifolium-wang/tutu-cache)](https://github.com/trifolium-wang/tutu-cache/blob/master/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/trifolium-wang/tutu-cache)](https://github.com/trifolium-wang/tutu-cache/issues)
-[![RELEASE](https://img.shields.io/badge/RELEASE-1.0.3.RELEASE-blue)](https://github.com/trifolium-wang/tutu-cache/releases/tag/1.0.3.RELEASE)
+[![RELEASE](https://img.shields.io/badge/RELEASE-1.0.4-blue)](https://github.com/trifolium-wang/tutu-cache/releases/tag/1.0.3.RELEASE)
 
 ### Version
+* 1.0.4
 * 1.0.3.RELEASE
 * 1.0.2.RELEASE
 * 1.0.1.RELEASE
@@ -18,6 +19,7 @@ tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
 1. 在springBoot中的使用
     * 引入jar依赖包
       ```xml
+      <dependencies>
         <dependency>
             <groupId>co.tunan.tucache</groupId>
             <artifactId>tucache-spring-boot-starter</artifactId>
@@ -27,6 +29,7 @@ tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
+      </dependencies>
         <!-- 或者其他缓存 -->
       ```
     * 在Configure类中注册javaBean redisTemplate或者使用默认的redisTemplate，必须开启aspectj的aop功能(默认是开启的)
@@ -53,14 +56,15 @@ tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
     * 在applicationContent.xml中配置
         ```xml
         <!-- 如果使用的缓存是redis则注入默认实现的RedisCacheService -->
-        <bean id="redisCacheService" class="co.tunan.tucache.core.cache.impl.RedisCacheService">
-            <property name="redisTemplate" ref="redisTemplate" />
-        </bean>
+        <beans>
+            <bean id="redisCacheService" class="co.tunan.tucache.core.cache.impl.RedisCacheService">
+                <property name="redisTemplate" ref="redisTemplate" />
+            </bean>
         
-        <bean id="tuCacheAspect" class="co.tunan.tucache.core.aspect.TuCacheAspect">
-            <property name="tuCacheService" ref="redisCacheService" />
-        </bean>
-        
+            <bean id="tuCacheAspect" class="co.tunan.tucache.core.aspect.TuCacheAspect">
+                <property name="tuCacheService" ref="redisCacheService" />
+            </bean>
+        </beans>
         <!-- 注意项目中需要引入spring-aop和spring-data-redis的相关依赖 -->
         ```
 ### 使用tu-cache
@@ -71,7 +75,7 @@ tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
         return Arrays.asList("tu","nan");
     }
     ```
-1. 使用tu-cache删除缓存中的数据
+2. 使用tu-cache删除缓存中的数据
     ```java
     @TuCacheClear("test_service:getList")
     public void delList(){

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 /**
  * 为了方便将缓存注解直接放到Controller，实际场景中建议放在Service或者Component中
@@ -93,33 +94,25 @@ public class BaseTestController {
     }
 
 
-    @GetMapping("/clear_all")
-    @TuCacheClear(keys = {"simple", "test_keys", "bean_fun", "bean_obj3", "condition_test"}, async = true)
-    public String clearAll() {
-
-        log.debug("清理所有缓存");
-        return "缓存全部清理!";
-    }
-
     @GetMapping("/long_test")
     @TuCache(key = "lang:test", timeout = 5)
     public long testLong() {
-
-        log.debug("进入testLong缓存方法");
-        return 6;
+        int i = new Random().nextInt(5);
+        log.debug("进入testLong缓存方法, long={}", i);
+        return i;
     }
 
 
     @GetMapping("/object_test")
-    @TuCache(key = "object:test")
+    @TuCache(key = "object:test", timeout = 3)
     public User testObject() {
 
         log.debug("测试对象缓存");
-        return new User();
+        return new User("n", new Random().nextInt(5));
     }
 
     @GetMapping("/obj_list_test")
-    @TuCache(key = "obj_list:test")
+    @TuCache(key = "obj_list:test", timeout = 3)
     public List<User> testObjectList() {
 
         log.debug("数组类型方法返回值序列化");
@@ -127,24 +120,32 @@ public class BaseTestController {
     }
 
     @GetMapping("/obj_array_test")
-    @TuCache(key = "obj_array:test")
+    @TuCache(key = "obj_array:test", timeout = 3)
     public User[] testObjectArray() {
 
         log.debug("数组类型方法返回值序列化");
-        return new User[]{new User(), new User(), new User(), new User()};
+        return new User[]{new User("n1", new Random().nextInt(5)), new User("n2", new Random().nextInt(5))};
     }
 
     @GetMapping("/test_enum")
-    @TuCache(key = "test_enum:test_enum")
+    @TuCache(key = "test_enum:test_enum", timeout = 60)
     public TestEnum testEnum() {
 
         log.debug("测试枚举");
         return TestEnum.N1;
     }
 
+
+    @GetMapping("/clear_caches")
+    @TuCacheClear(keys = {"simple", "test_keys", "bean_fun", "bean_obj3", "condition_test", "test_enum"}, async = true)
+    public String clearCaches() {
+
+        log.debug("清理所有缓存");
+        return "缓存全部清理!";
+    }
+
     public String thisFun() {
 
         return "this_function";
     }
-
 }

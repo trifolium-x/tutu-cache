@@ -65,7 +65,6 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
     @Around("@annotation(co.tunan.tucache.core.annotation.TuCache)")
     public Object cache(ProceedingJoinPoint pjp) throws Throwable {
         if (tuCacheService != null) {
-            log.debug("tu-cache caching");
             Object targetObj = pjp.getTarget();
             Signature signature = pjp.getSignature();
             MethodSignature methodSignature = (MethodSignature) signature;
@@ -111,6 +110,7 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
                 try {
                     if (cacheResult != null) {
                         final Object finaCacheResult = cacheResult;
+                        debugLog("tu-cache write to cache.");
                         if (timeout == -1) {
                             if (tuCache.async()) {
                                 syncExecutorService.execute(() -> tuCacheService.set(cacheKey, finaCacheResult));
@@ -132,6 +132,7 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
                 }
             }
 
+            debugLog("tu-cache hit cache.");
             return cacheResult;
         }
 
@@ -142,8 +143,6 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
     public Object clear(ProceedingJoinPoint pjp) throws Throwable {
 
         if (tuCacheService != null) {
-
-            log.debug("tu-cache clear.");
 
             Object targetObj = pjp.getTarget();
             Signature signature = pjp.getSignature();
@@ -162,6 +161,7 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
             String[] keys = tuCacheClear.keys();
 
             try {
+                debugLog("tu-cache remove cache.");
                 for (String item : key) {
                     String cKey = tuKeyGenerate.generate(tuCacheProfiles, item, targetObj, method, args);
                     if (tuCacheClear.async()) {
@@ -179,7 +179,7 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
                     }
                 }
             } catch (Exception e) {
-                log.warn("failed to clean cache.");
+                log.warn("failed to remove cache.");
                 log.error(e.getMessage(), e);
             }
         }
@@ -210,7 +210,7 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
     public void destroy() {
         if (syncExecutorService != null && !syncExecutorService.isShutdown()) {
             syncExecutorService.shutdownNow();
-            log.info("tu-cache is destroy");
+            log.info("tu-cache is destroyed.");
         }
     }
 
@@ -220,4 +220,10 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
         this.beanFactory = beanFactory;
     }
 
+    private void debugLog(String msg){
+
+        if(tuCacheProfiles.isEnableDebugLog()){
+            log.debug(msg);
+        }
+    }
 }

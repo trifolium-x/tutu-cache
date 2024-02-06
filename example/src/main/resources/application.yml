@@ -3,19 +3,26 @@ server:
     context-path: /
   port: 8080
 
-spring:
-  cache:
-    type: redis
-  redis:
-    database: 0
-    host: localhost
-    port: 6379
-    jedis:
-      pool:
-        max-active: 2
-        max-wait: 5000ms
-        min-idle: 0
-        max-idle: 2
+#spring:
+#  cache:
+#    type: redis
+#  redis:
+#    database: 0
+#    host: localhost
+#    port: 6379
+#    jedis:
+#      pool:
+#        max-active: 2
+#        max-wait: 5000ms
+#        min-idle: 0
+#        max-idle: 2
+#tucache:
+#  profiles:
+#    cache-prefix: "prefix_key_test:"
+#    pool:
+#      core-thread-num: 2
+#    enable-debug-log: true
+#  cache-type: redis
 
 logging:
   level:
@@ -28,4 +35,5 @@ tucache:
     cache-prefix: "prefix_key_test:"
     pool:
       core-thread-num: 2
+    enable-debug-log: true
   cache-type: local

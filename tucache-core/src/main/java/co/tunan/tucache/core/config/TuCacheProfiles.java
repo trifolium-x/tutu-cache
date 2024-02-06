@@ -17,12 +17,17 @@ import lombok.ToString;
 public class TuCacheProfiles {
 
     /**
-     * 缓存的统一key前缀，默认为 ""
+     * Unified key prefix for caching, defaults to "".
      */
     private String cachePrefix = "";
 
     /**
-     * 线程池
+     * Whether to enable cache debug logging to check if the cache is hit and to clean it up.
+     */
+    private boolean enableDebugLog = false;
+
+    /**
+     * Thread pool configuration
      */
     private ThreadPool pool = new ThreadPool();
 
