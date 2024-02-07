@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 /**
  * User-defined TuCacheService should <strong>not inherit</strong> this class
  * <p>
- * 用户不要集成该类，否则无法自动推导
+ * 用户不要继承该类，否则无法自动推导
  * </p>
  *
  * @title: AbstractTuCacheService

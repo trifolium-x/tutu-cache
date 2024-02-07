@@ -20,7 +20,7 @@ public class LocalCacheServiceConfigure {
     @Bean("localTuCacheService")
     public TuCacheService localTuCacheService() {
 
-        log.debug("injected with localTuCacheService");
+        log.debug("Injected with LocalTuCacheService");
 
         return new LocalCacheService();
     }

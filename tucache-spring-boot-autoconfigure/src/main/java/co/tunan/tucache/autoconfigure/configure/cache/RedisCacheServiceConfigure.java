@@ -24,7 +24,7 @@ public class RedisCacheServiceConfigure {
     @Bean("redisTuCacheService")
     public TuCacheService redisTuCacheService(org.springframework.data.redis.core.RedisTemplate redisTemplate) {
 
-        log.debug("injected with redisTuCacheService");
+        log.debug("Injected with RedisTuCacheService");
         return new RedisCacheService(redisTemplate);
     }
 }

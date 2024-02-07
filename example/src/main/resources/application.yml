@@ -16,19 +16,12 @@ server:
 #        max-wait: 5000ms
 #        min-idle: 0
 #        max-idle: 2
-#tucache:
-#  profiles:
-#    cache-prefix: "prefix_key_test:"
-#    pool:
-#      core-thread-num: 2
-#    enable-debug-log: true
-#  cache-type: redis
 
 logging:
   level:
     co.tunan.tucache: debug
-  file:
-    name: logs/log.log
+#  file:
+#    name: logs/log.log
 
 tucache:
   profiles:
@@ -36,4 +29,4 @@ tucache:
     pool:
       core-thread-num: 2
     enable-debug-log: true
-  cache-type: local
+  cache-type: auto

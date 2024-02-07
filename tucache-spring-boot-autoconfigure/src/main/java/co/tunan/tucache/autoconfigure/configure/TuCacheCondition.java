@@ -47,6 +47,11 @@ public class TuCacheCondition extends SpringBootCondition {
             cacheType = TuCacheProfilesConfigure.CacheType.AUTO;
         }
 
+        return getConditionOutcome(message, cacheType, sourceClass);
+    }
+
+    private static ConditionOutcome getConditionOutcome(ConditionMessage.Builder message,
+                                                        TuCacheProfilesConfigure.CacheType cacheType, String sourceClass) {
         ConditionOutcome outcome = null;
 
         ConditionMessage msg = message.because("tucache.cache-type=" + cacheType);
@@ -68,7 +73,6 @@ public class TuCacheCondition extends SpringBootCondition {
         if (outcome == null) {
             outcome = ConditionOutcome.noMatch(message.because(" but " + msg));
         }
-
         return outcome;
     }
 }

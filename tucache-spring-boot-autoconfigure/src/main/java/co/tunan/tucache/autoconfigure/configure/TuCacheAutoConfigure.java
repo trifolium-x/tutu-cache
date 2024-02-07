@@ -81,13 +81,11 @@ public class TuCacheAutoConfigure {
                 tuCacheService = tuCacheServices.stream().filter(cs -> cs instanceof LocalCacheService)
                         .findFirst().orElseThrow(() -> new BeanCreationException("LocalCacheService",
                                 "LocalCacheService bean does not exist, but tucache.cache-type=" + cacheType));
-
                 break;
             case REDIS:
                 tuCacheService = tuCacheServices.stream().filter(cs -> cs instanceof RedisCacheService)
                         .findFirst().orElseThrow(() -> new BeanCreationException("RedisCacheService",
                                 "RedisCacheService bean does not exist, but tucache.cache-type=" + cacheType));
-
                 break;
             default:
                 // 根据 <custom> > REDIS > LOCAL的优先级选用，
