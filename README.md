@@ -3,7 +3,7 @@ tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
 
 [![GitHub license](https://img.shields.io/github/license/trifolium-wang/tutu-cache)](https://github.com/trifolium-wang/tutu-cache/blob/master/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/trifolium-wang/tutu-cache)](https://github.com/trifolium-wang/tutu-cache/issues)
-[![RELEASE](https://img.shields.io/badge/RELEASE-1.0.4-blue)](https://github.com/trifolium-wang/tutu-cache/releases/tag/1.0.3.RELEASE)
+[![RELEASE](https://img.shields.io/badge/RELEASE-1.0.4-blue)](https://github.com/trifolium-wang/tutu-cache/releases/tag/1.0.4)
 
 ### Version
 * 1.0.4
@@ -23,7 +23,7 @@ tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
         <dependency>
             <groupId>co.tunan.tucache</groupId>
             <artifactId>tucache-spring-boot-starter</artifactId>
-            <version>1.0.3.RELEASE</version>
+            <version>1.0.4</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -50,7 +50,7 @@ tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
         <dependency>
           <groupId>co.tunan.tucache</groupId>
           <artifactId>cache-core</artifactId>
-          <version>1.0.3.RELEASE</version>
+          <version>1.0.4</version>
         </dependency>
         ```
     * 在applicationContent.xml中配置
@@ -89,19 +89,19 @@ tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
     * `String condition() default "true"` 扩展的条件过滤，值为spEl表达式(直接编写表达式不需要使用#{}方式声明为spEl)
     * 样例:
         ```java
-        @TuCache(key="test_service:getList:#{#endStr}", expire = 10, timeUnit=TimeUnit.SECONDS)
+        @TuCache(key="test_service:getList:#{#endStr}", timeout = 10, timeUnit=TimeUnit.SECONDS)
         public List<String> getList(String endStr){
             return Arrays.asList("tu","nan",endStr);
         }
         
         // 如果需要当前对象的的方法
-        @TuCache(key="test_service:getList:#{#this.endStr()}",expire = 120)
+        @TuCache(key="test_service:getList:#{#this.endStr()}", timeout = 120)
         public List<String> getList(){
             return Arrays.asList("tu","nan",endStr());
         }
         
         // 使用springBean, (使用安全访问符号?.，可以规避null错误，具体用法请查看spEl表达式)
-        @TuCache(key="test_service:getList:#{@springBean.endStr()}",expire = 120)
+        @TuCache(key="test_service:getList:#{@springBean.endStr()}", timeout = 120)
         public List<String> springBeanGetList(){
             return Arrays.asList("tu","nan",springBean.endStr());
         }
@@ -139,7 +139,8 @@ tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
       * condition = "false"
 
 ### 版本对应的spring基础环境版本
-* 建议springBoot版本在2.1.x-2.7.x
+* 建议springBoot版本在2.1.x-2.7.x,目前兼容springBoot3
+* tucache 1.0.4 ----- spring 5.3.29 ----- springBoot版本2.6.17
 * tucache 1.0.3.RELEASE ----- spring 5.3.15 ----- springBoot版本2.6.3
 * tucache 1.0.2.RELEASE ----- spring 5.1.3.RELEASE ----- springBoot版本2.1.1.RELEASE
 * tucache 1.0.1.RELEASE ----- spring 5.1.3.RELEASE ----- springBoot版本2.1.1.RELEASE

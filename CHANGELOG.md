@@ -1,14 +1,18 @@
 # Change Log
 
+## [1.0.5] - 2024-xx
 
-## [1.0.4.RELEASE] - 2023-xx
+### Changed
+- 
+
+## [1.0.4] - 2024-02-08
 
 ### Changed
 - 升级Springboot到2.7.15
 - 兼容SpringBoot3的自动配置
 - 统一管理了项目版本
 - 添加了本地缓存TuTreeCache，在非redis环境下也可以使用tucache
--
+
 ### Fixed
 - 修复了redis返序列化Long自动转为Integer的问题
 
