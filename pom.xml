@@ -29,7 +29,7 @@
 
     <groupId>co.tunan.tucache</groupId>
     <artifactId>tutucache</artifactId>
-    <version>${revision}</version>
+    <version>1.0.5-SNAPSHOT</version>
     <modules>
         <module>tucache-core</module>
         <module>tucache-spring-boot-starter</module>
@@ -67,7 +67,6 @@
     </developers>
 
     <properties>
-        <revision>1.0.5-SNAPSHOTS</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>8</java.version>
@@ -95,6 +94,16 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
                 <version>3.8.1</version>
+            </plugin>
+
+            <!-- mvn versions:set -DnewVersion=版本号  用于设置全局版本号-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.14.0</version>
+                <configuration>
+                    <generateBackupPoms>false</generateBackupPoms>
+                </configuration>
             </plugin>
 
         </plugins>
