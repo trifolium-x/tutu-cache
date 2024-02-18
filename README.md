@@ -3,10 +3,10 @@ tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
 
 [![GitHub license](https://img.shields.io/github/license/trifolium-wang/tutu-cache)](https://github.com/trifolium-wang/tutu-cache/blob/master/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/trifolium-wang/tutu-cache)](https://github.com/trifolium-wang/tutu-cache/issues)
-[![RELEASE](https://img.shields.io/badge/RELEASE-1.0.4-blue)](https://github.com/trifolium-wang/tutu-cache/releases/tag/1.0.4)
+[![RELEASE](https://img.shields.io/badge/RELEASE-1.0.4.RELEASE-blue)](https://github.com/trifolium-wang/tutu-cache/releases/tag/1.0.4.RELEASE)
 
 ### Version
-* 1.0.4
+* 1.0.4.RELEASE
 * 1.0.3.RELEASE
 * 1.0.2.RELEASE
 * 1.0.1.RELEASE
@@ -23,7 +23,7 @@ tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
         <dependency>
             <groupId>co.tunan.tucache</groupId>
             <artifactId>tucache-spring-boot-starter</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.4.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -50,7 +50,7 @@ tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
         <dependency>
           <groupId>co.tunan.tucache</groupId>
           <artifactId>cache-core</artifactId>
-          <version>1.0.4</version>
+          <version>1.0.4.RELEASE</version>
         </dependency>
         ```
     * 在applicationContent.xml中配置
@@ -83,7 +83,7 @@ tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
     ```
 3. @TuCache参数
     * `String key() default ""` 缓存的字符串格式key,支持spEl表达式(使用#{}包裹spEl表达式)，默认值为方法签名
-    * `long expire() default -1` 缓存的过期时间，单位(秒),默认永不过期. (**在1.0.4以上版本中建议使用 `timeout`**)
+    * `long expire() default -1` 缓存的过期时间，单位(秒),默认永不过期. (**在1.0.4.RELEASE以上版本中建议使用 `timeout`**)
     * `boolean resetExpire() default false` 每次获取数据是否重置过期时间.
     * `TimeUnit timeUnit() default TimeUnit.SECONDS` 缓存的时间单位.
     * `String condition() default "true"` 扩展的条件过滤，值为spEl表达式(直接编写表达式不需要使用#{}方式声明为spEl)
@@ -140,7 +140,7 @@ tutu-cache tutu-cache 是一个简单易用的Spring缓存注解。
 
 ### 版本对应的spring基础环境版本
 * 建议springBoot版本在2.1.x-2.7.x,目前兼容springBoot3
-* tucache 1.0.4 ----- spring 5.3.29 ----- springBoot版本2.6.17
+* tucache 1.0.4.RELEASE ----- spring 5.3.29 ----- springBoot版本2.6.17
 * tucache 1.0.3.RELEASE ----- spring 5.3.15 ----- springBoot版本2.6.3
 * tucache 1.0.2.RELEASE ----- spring 5.1.3.RELEASE ----- springBoot版本2.1.1.RELEASE
 * tucache 1.0.1.RELEASE ----- spring 5.1.3.RELEASE ----- springBoot版本2.1.1.RELEASE
