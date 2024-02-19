@@ -1,10 +1,10 @@
-![tutu-cache](https://socialify.git.ci/trifolium-wang/tutu-cache/image?description=1&font=Inter&forks=1&issues=1&language=1&name=1&owner=1&pattern=Circuit%20Board&pulls=1&stargazers=1&theme=Light)
+![tutu-cache](https://socialify.git.ci/trifolium-x/tutu-cache/image?description=1&font=Inter&forks=1&issues=1&language=1&name=1&owner=1&pattern=Circuit%20Board&pulls=1&stargazers=1&theme=Light)
 tutu-cache 是一个简单易用的Spring缓存注解。
 <br/>
 使用tutu-cache注解来代替@Cacheable和@CacheEvict等注解
 
-[![GitHub license](https://img.shields.io/github/license/trifolium-wang/tutu-cache)](https://github.com/trifolium-wang/tutu-cache/blob/master/LICENSE)
-[![RELEASE](https://img.shields.io/badge/RELEASE-1.0.4.RELEASE-blue)](https://github.com/trifolium-wang/tutu-cache/releases/tag/1.0.4.RELEASE)
+[![GitHub license](https://img.shields.io/github/license/trifolium-x/tutu-cache)](https://github.com/trifolium-x/tutu-cache/blob/master/LICENSE)
+[![RELEASE](https://img.shields.io/badge/RELEASE-1.0.4.RELEASE-blue)](https://github.com/trifolium-x/tutu-cache/releases/tag/1.0.4.RELEASE)
 
 ### Version
 * 1.0.4.RELEASE
