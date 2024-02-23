@@ -11,7 +11,6 @@ import co.tunan.tucache.core.pool.TucacheDefaultThreadPool;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -66,122 +65,25 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
     public Object cache(ProceedingJoinPoint pjp) throws Throwable {
         if (tuCacheService != null) {
             Object targetObj = pjp.getTarget();
-            Signature signature = pjp.getSignature();
-            MethodSignature methodSignature = (MethodSignature) signature;
-            Method method = methodSignature.getMethod();
-            Class<?> returnType = method.getReturnType();
-            Object[] args = pjp.getArgs();
-            TuCache tuCache = method.getAnnotation(TuCache.class);
+            Method method = ((MethodSignature) pjp.getSignature()).getMethod();
 
-            if (tuCache == null || returnType.equals(void.class)
-                    || !new TuConditionProcess(this.beanFactory).accept(tuCache.condition(), targetObj, method, args)) {
-
-                return pjp.proceed();
-            }
-
-            String spElKey = StringUtils.hasLength(tuCache.key()) ? tuCache.key() : tuCache.value();
-
-            String cacheKey = tuKeyGenerate.generate(tuCacheProfiles, spElKey, targetObj, method, args);
-
-            Object cacheResult;
-
-            long timeout = tuCache.timeout() == -1 ? (tuCache.expire() == -1 ? -1 : tuCache.expire())
-                    : tuCache.timeout();
-            // 从缓存中获取数据，如果出错，则直接返回方法处理
-            try {
-                if (tuCache.resetExpire()) {
-                    // Get data and reset the expiration time
-                    cacheResult = tuCacheService.get(cacheKey, returnType, timeout, tuCache.timeUnit());
-                } else {
-                    cacheResult = tuCacheService.get(cacheKey, returnType);
-                }
-
-            } catch (Exception e) {
-
-                log.warn("cache miss,key:" + cacheKey);
-                log.error(e.getMessage(), e);
-
-                return pjp.proceed();
-            }
-            // 如果缓存中没有数据就放入，否则直接返回缓存的数据
-            // 如果缓存中返回的是null，就认为没有缓存，直接运行方法获取最新数据
-            if (cacheResult == null) {
-                cacheResult = pjp.proceed();
-                try {
-                    if (cacheResult != null) {
-                        final Object finaCacheResult = cacheResult;
-                        debugLog("tu-cache write to cache.");
-                        if (timeout == -1) {
-                            if (tuCache.async()) {
-                                syncExecutorService.execute(() -> tuCacheService.set(cacheKey, finaCacheResult));
-                            } else {
-                                tuCacheService.set(cacheKey, cacheResult);
-                            }
-                        } else {
-                            if (tuCache.async()) {
-                                syncExecutorService.execute(() -> tuCacheService.set(cacheKey, finaCacheResult,
-                                        timeout, tuCache.timeUnit()));
-                            } else {
-                                tuCacheService.set(cacheKey, cacheResult, timeout, tuCache.timeUnit());
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    log.warn("cache miss,key:" + cacheKey);
-                    log.error(e.getMessage(), e);
-                }
-            }
-
-            debugLog("tu-cache hit cache.");
-            return cacheResult;
+            return processTuCache(method.getAnnotation(TuCache.class), targetObj, method,
+                    pjp.getArgs(), method.getReturnType(), pjp::proceed);
         }
 
         return pjp.proceed();
     }
 
+
     @Around("@annotation(co.tunan.tucache.core.annotation.TuCacheClear)")
     public Object clear(ProceedingJoinPoint pjp) throws Throwable {
 
         if (tuCacheService != null) {
-
             Object targetObj = pjp.getTarget();
-            Signature signature = pjp.getSignature();
-            MethodSignature methodSignature = (MethodSignature) signature;
-            Method method = methodSignature.getMethod();
-            TuCacheClear tuCacheClear = method.getAnnotation(TuCacheClear.class);
-            Object[] args = pjp.getArgs();
+            Method method = ((MethodSignature) pjp.getSignature()).getMethod();
 
-            if (tuCacheClear == null || !new TuConditionProcess(this.beanFactory)
-                    .accept(tuCacheClear.condition(), targetObj, method, args)) {
-
-                return pjp.proceed();
-            }
-
-            String[] key = tuCacheClear.key().length == 0 ? tuCacheClear.value() : tuCacheClear.key();
-            String[] keys = tuCacheClear.keys();
-
-            try {
-                debugLog("tu-cache remove cache.");
-                for (String item : key) {
-                    String cKey = tuKeyGenerate.generate(tuCacheProfiles, item, targetObj, method, args);
-                    if (tuCacheClear.async()) {
-                        syncExecutorService.execute(() -> tuCacheService.delete(cKey));
-                    } else {
-                        tuCacheService.delete(cKey);
-                    }
-                }
-                for (String item : keys) {
-                    String cKey = tuKeyGenerate.generate(tuCacheProfiles, item, targetObj, method, args);
-                    if (tuCacheClear.async()) {
-                        syncExecutorService.execute(() -> tuCacheService.deleteKeys(cKey));
-                    } else {
-                        tuCacheService.deleteKeys(cKey);
-                    }
-                }
-            } catch (Exception e) {
-                log.warn("failed to remove cache.");
-                log.error(e.getMessage(), e);
-            }
+            processTuCacheClear(method.getAnnotation(TuCacheClear.class), targetObj,
+                    method, pjp.getArgs());
         }
 
         return pjp.proceed();
@@ -220,9 +122,116 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
         this.beanFactory = beanFactory;
     }
 
-    private void debugLog(String msg){
+    /**
+     * 处理TuCache缓存
+     */
+    private Object processTuCache(TuCache tuCache, Object targetObj, Method method,
+                                  Object[] args, Class<?> returnType, ResultSupplier<Object> resultSup)
+            throws Throwable {
 
-        if(tuCacheProfiles.isEnableDebugLog()){
+        if (tuCache != null && !returnType.equals(void.class)
+                && new TuConditionProcess(this.beanFactory).accept(tuCache.condition(), targetObj, method, args)) {
+
+            String spElKey = StringUtils.hasLength(tuCache.key()) ? tuCache.key() : tuCache.value();
+
+            String cacheKey = tuKeyGenerate.generate(tuCacheProfiles, spElKey, targetObj, method, args);
+
+            Object cacheResult;
+
+            // TODO 兼容1.0.4.RELEASE 以前的版本，在1.0.5之后会完全弃用
+            long timeout = tuCache.timeout() == -1 ? (tuCache.expire() == -1 ? -1 : tuCache.expire())
+                    : tuCache.timeout();
+            // 从缓存中获取数据，如果出错，则直接返回方法处理
+            try {
+                if (tuCache.resetExpire()) {
+                    // Get data and reset the expiration time
+                    cacheResult = tuCacheService.get(cacheKey, returnType, timeout, tuCache.timeUnit());
+                } else {
+                    cacheResult = tuCacheService.get(cacheKey, returnType);
+                }
+
+            } catch (Exception e) {
+
+                log.warn("cache miss,key:" + cacheKey);
+                log.error(e.getMessage(), e);
+
+                return null;
+            }
+            // 如果缓存中没有数据就放入，否则直接返回缓存的数据
+            // 如果缓存中返回的是null，就认为没有缓存，直接运行方法获取最新数据
+            if (cacheResult == null) {
+                cacheResult = resultSup.get();
+                try {
+                    if (cacheResult != null) {
+                        final Object finaCacheResult = cacheResult;
+                        debugLog("tu-cache write to cache.");
+                        if (timeout == -1) {
+                            if (tuCache.async()) {
+                                syncExecutorService.execute(() -> tuCacheService.set(cacheKey, finaCacheResult));
+                            } else {
+                                tuCacheService.set(cacheKey, cacheResult);
+                            }
+                        } else {
+                            if (tuCache.async()) {
+                                syncExecutorService.execute(() -> tuCacheService.set(cacheKey, finaCacheResult,
+                                        timeout, tuCache.timeUnit()));
+                            } else {
+                                tuCacheService.set(cacheKey, cacheResult, timeout, tuCache.timeUnit());
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    log.warn("cache miss,key:" + cacheKey);
+                    log.error(e.getMessage(), e);
+                }
+            }
+
+            debugLog("tu-cache hit cache.");
+            return cacheResult;
+        }
+
+        return null;
+    }
+
+    /**
+     * 处理TuCacheClear缓存
+     */
+    private void processTuCacheClear(TuCacheClear tuCacheClear, Object targetObj, Method method, Object[] args) {
+
+        if (tuCacheClear != null && new TuConditionProcess(this.beanFactory)
+                .accept(tuCacheClear.condition(), targetObj, method, args)) {
+
+            String[] key = tuCacheClear.key().length == 0 ? tuCacheClear.value() : tuCacheClear.key();
+            String[] keys = tuCacheClear.keys();
+
+            try {
+                debugLog("tu-cache remove cache.");
+                for (String item : key) {
+                    String cKey = tuKeyGenerate.generate(tuCacheProfiles, item, targetObj, method, args);
+                    if (tuCacheClear.async()) {
+                        syncExecutorService.execute(() -> tuCacheService.delete(cKey));
+                    } else {
+                        tuCacheService.delete(cKey);
+                    }
+                }
+                for (String item : keys) {
+                    String cKey = tuKeyGenerate.generate(tuCacheProfiles, item, targetObj, method, args);
+                    if (tuCacheClear.async()) {
+                        syncExecutorService.execute(() -> tuCacheService.deleteKeys(cKey));
+                    } else {
+                        tuCacheService.deleteKeys(cKey);
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("failed to remove cache.");
+                log.error(e.getMessage(), e);
+            }
+        }
+    }
+
+    private void debugLog(String msg) {
+
+        if (tuCacheProfiles.isEnableDebugLog()) {
             log.debug(msg);
         }
     }
