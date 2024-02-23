@@ -26,12 +26,12 @@ tutu-cache 是一个简单易用的Spring缓存注解。
             <artifactId>tucache-spring-boot-starter</artifactId>
             <version>1.0.4.RELEASE</version>
         </dependency>
+        <!-- 可选，建议使用redis,如有没redis依赖默认使用本地缓存 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
       </dependencies>
-        <!-- 或者其他缓存 -->
       ```
     * 在Configure类中注册javaBean redisTemplate或者使用默认的redisTemplate，必须开启aspectj的aop功能(默认是开启的)
       ```java
