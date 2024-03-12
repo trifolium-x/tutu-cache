@@ -192,4 +192,4 @@ tutu-cache 是一个简单易用的Spring缓存注解。
 #### 希望更多的开发者参与
 ☕️[请我喝一杯咖啡]
 * *USDT address:`0xE8DF0c045714976c1c67fFc9aBb5538625d5EeDE`*
-* *network: BNB Smart Chain(BEP20)*
+* *network: BNB Smart Chain(BEP20),Polygon,Tron(TRC20),Ethereum(ERC20)*
