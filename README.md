@@ -45,29 +45,6 @@ tutu-cache 是一个简单易用的Spring缓存注解。
             return redisTemplate;
       }
       ```
-2. 在springMVC中的使用
-    * 引入jar依赖包
-        ```xml
-        <dependency>
-          <groupId>co.tunan.tucache</groupId>
-          <artifactId>cache-core</artifactId>
-          <version>1.0.4.RELEASE</version>
-        </dependency>
-        ```
-    * 在applicationContent.xml中配置
-        ```xml
-        <!-- 如果使用的缓存是redis则注入默认实现的RedisCacheService -->
-        <beans>
-            <bean id="redisCacheService" class="co.tunan.tucache.core.cache.impl.RedisCacheService">
-                <property name="redisTemplate" ref="redisTemplate" />
-            </bean>
-        
-            <bean id="tuCacheAspect" class="co.tunan.tucache.core.aspect.TuCacheAspect">
-                <property name="tuCacheService" ref="redisCacheService" />
-            </bean>
-        </beans>
-        <!-- 注意项目中需要引入spring-aop和spring-data-redis的相关依赖 -->
-        ```
 ### 使用tu-cache
 1. 使用tu-cache对service中的方法返回的数据进行缓存
     ```java
