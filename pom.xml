@@ -62,9 +62,16 @@
         <developer>
             <name>trifolium</name>
             <email>trifolium.wang@gmail.com</email>
+            <url>https://github.com/trifolium-x</url>
             <organization>QQ Group 76131683</organization>
+            <timezone>+8</timezone>
         </developer>
     </developers>
+
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/trifolium-x/tutu-cache/issues</url>
+    </issueManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
