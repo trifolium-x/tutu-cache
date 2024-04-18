@@ -138,9 +138,7 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
 
             Object cacheResult;
 
-            // TODO 兼容1.0.4.RELEASE 以前的版本，在1.0.5之后会完全弃用
-            long timeout = tuCache.timeout() == -1 ? (tuCache.expire() == -1 ? -1 : tuCache.expire())
-                    : tuCache.timeout();
+            long timeout = tuCache.timeout();
             // 从缓存中获取数据，如果出错，则直接返回方法处理
             try {
                 if (tuCache.resetExpire()) {
@@ -152,7 +150,7 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
 
             } catch (Exception e) {
 
-                log.warn("cache miss,key:" + cacheKey);
+                log.warn("cache miss, read error. key:{}", cacheKey);
                 log.error(e.getMessage(), e);
 
                 return null;
@@ -181,7 +179,7 @@ public class TuCacheAspect implements DisposableBean, InitializingBean, BeanFact
                         }
                     }
                 } catch (Exception e) {
-                    log.warn("cache miss,key:" + cacheKey);
+                    log.warn("cache miss, write error. key:{}", cacheKey);
                     log.error(e.getMessage(), e);
                 }
             }

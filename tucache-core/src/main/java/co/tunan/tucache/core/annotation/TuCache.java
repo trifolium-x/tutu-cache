@@ -40,19 +40,9 @@ public @interface TuCache {
      */
     String key() default "";
 
-    /**
-     * 缓存超时时间
-     * Cache expire, seconds
-     * Alias for {@link #timeout()}.
-     * @see #timeout()
-     * @deprecated {@link #timeout()} 计划在1.0.5版本之后会完全弃用
-     */
-    @Deprecated
-    long expire() default -1;
 
     /**
      * 缓存超时时间
-     * Alias for {@link #expire()}.
      * Cache timeout, in seconds.
      * default value is permanent (-1)
      */

@@ -4,8 +4,10 @@ import co.tunan.tucache.core.annotation.TuCache;
 import co.tunan.tucache.core.annotation.TuCacheClear;
 import co.tunan.tucache.example.model.TestEnum;
 import co.tunan.tucache.example.model.User;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,11 +25,13 @@ import java.util.Random;
  * @date: 2022/7/1
  * @modified :
  */
+@Slf4j
 @RestController
 @RequestMapping("/")
 public class BaseTestController {
 
-    private static final Logger log = LoggerFactory.getLogger(BaseTestController.class);
+    @Autowired
+    private GenericInterfacesTest<User> genericInterfacesTest;
 
     @GetMapping("/simple_cache")
     @TuCache(key = "simple:#{#param}", timeout = 10)
@@ -115,7 +119,7 @@ public class BaseTestController {
     @TuCache(key = "obj_list:test", timeout = 3)
     public List<User> testObjectList() {
 
-        log.debug("数组类型方法返回值序列化");
+        log.debug("数组类型方法返回值序列化1");
         return Arrays.asList(testObjectArray());
     }
 
@@ -123,7 +127,7 @@ public class BaseTestController {
     @TuCache(key = "obj_array:test", timeout = 3)
     public User[] testObjectArray() {
 
-        log.debug("数组类型方法返回值序列化");
+        log.debug("数组类型方法返回值序列化2");
         return new User[]{new User("n1", new Random().nextInt(5)), new User("n2", new Random().nextInt(5))};
     }
 
@@ -133,6 +137,22 @@ public class BaseTestController {
 
         log.debug("测试枚举");
         return TestEnum.N1;
+    }
+
+    @GetMapping("/test_generic")
+    @TuCache(key = "test_generic:test_generic", timeout = 60)
+    public List<User> testGeneric(){
+
+        log.debug("测试泛型接口");
+        return genericInterfacesTest.getUsers();
+    }
+
+    @GetMapping("/test_generic2")
+    @TuCache(key = "test_generic2:test_generic2", timeout = 60)
+    public User testGeneric2(){
+
+        log.debug("测试泛型接口2");
+        return genericInterfacesTest.getUser();
     }
 
 
