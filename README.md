@@ -11,7 +11,6 @@ tutu-cache 是一个简单易用的Spring缓存注解。
 * 1.0.3.RELEASE
 * 1.0.2.RELEASE
 * 1.0.1.RELEASE
-* 1.0.1
 * 1.0.0
 
 ### 参考文档
@@ -165,11 +164,13 @@ tutu-cache 是一个简单易用的Spring缓存注解。
     }
     ```
   
-#### QQ 交流群: 76131683
+#### 作者QQ 交流群: 76131683
 #### 希望更多的开发者参与
 ☕️[请我喝一杯咖啡]
-* *USDT address:`0xE8DF0c045714976c1c67fFc9aBb5538625d5EeDE`*
-* *network: BNB Smart Chain(BEP20),Polygon,Ethereum(ERC20)*
+* USDT address:`0xE8DF0c045714976c1c67fFc9aBb5538625d5EeDE`*
+* network: BNB Smart Chain(BEP20),Polygon,Ethereum(ERC20)*
+* ↓↓↓ 微信扫码 ↓↓↓
+* <img src="assets/payee/wechat.jpg" width="30%" alt="赞赏码"/>
 
 ### [感谢JetBrains提供的免费授权](https://www.jetbrains.com/?from=tutu-cache)
 [![JetBrains logo](assets/thanks/jetbrains.svg)](https://www.jetbrains.com/?from=tutu-cache)
