@@ -32,18 +32,6 @@ tutu-cache 是一个简单易用的Spring缓存注解。
         </dependency>
       </dependencies>
       ```
-    * 在Configure类中注册javaBean redisTemplate或者使用默认的redisTemplate，必须开启aspectj的aop功能(默认是开启的)
-      ```java
-      @Bean(name = "redisTemplate")
-      public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-            RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-            redisTemplate.setKeySerializer(new StringRedisSerializer());
-            redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-            redisTemplate.setConnectionFactory(redisConnectionFactory);
-      
-            return redisTemplate;
-      }
-      ```
 ### 使用tu-cache
 1. 使用tu-cache对service中的方法返回的数据进行缓存
     ```java
@@ -115,6 +103,18 @@ tutu-cache 是一个简单易用的Spring缓存注解。
       * condition = "#param.startsWith('a')"
       * condition = "false"
 
+* 建议自定义序列化在Configure类中注册javaBean redisTemplate或者使用默认的redisTemplate，必须开启aspectj的aop功能(默认是开启的)
+  ```java
+  @Bean(name = "redisTemplate")
+  public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+  RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+  redisTemplate.setKeySerializer(new StringRedisSerializer());
+  redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+  redisTemplate.setConnectionFactory(redisConnectionFactory);
+
+            return redisTemplate;
+      }
+      ```
 ### 版本对应的spring基础环境版本
 * 建议springBoot版本在2.1.x-2.7.x,目前兼容springBoot3
 * tucache 1.0.4.RELEASE ----- spring 5.3.29 ----- springBoot版本2.6.17
@@ -167,10 +167,9 @@ tutu-cache 是一个简单易用的Spring缓存注解。
 #### 作者QQ 交流群: 76131683
 #### 希望更多的开发者参与
 ☕️[请我喝一杯咖啡]
-* USDT address:`0xE8DF0c045714976c1c67fFc9aBb5538625d5EeDE`*
-* network: BNB Smart Chain(BEP20),Polygon,Ethereum(ERC20)*
 * ↓↓↓ 微信扫码 ↓↓↓
-* <img src="assets/payee/wechat.jpg" width="30%" alt="赞赏码"/>
+
+<img src="assets/payee/wechat.jpg" width="25%" alt="赞赏码"/>
 
 ### [感谢JetBrains提供的免费授权](https://www.jetbrains.com/?from=tutu-cache)
 [![JetBrains logo](assets/thanks/jetbrains.svg)](https://www.jetbrains.com/?from=tutu-cache)
