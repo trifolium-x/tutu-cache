@@ -171,5 +171,13 @@ tutu-cache 是一个简单易用的Spring缓存注解。
 
 <img src="assets/payee/wechat.jpg" width="25%" alt="赞赏码"/>
 
+### 打赏列表
+| 昵称(按时间顺序) | 金额 |
+|-----------|----|
+|  一直在梦想路上 | 20  |
+|           |    |
+|           |    |
+
+
 ### [感谢JetBrains提供的免费授权](https://www.jetbrains.com/?from=tutu-cache)
 [![JetBrains logo](assets/thanks/jetbrains.svg)](https://www.jetbrains.com/?from=tutu-cache)
