@@ -109,12 +109,6 @@ tutu-cache 是一个简单易用的Spring缓存注解。
             return redisTemplate;
       }
       ```
-### 版本对应的spring基础环境版本
-* 建议springBoot版本在2.1.x-2.7.x,目前兼容springBoot3
-* tucache 1.0.4.RELEASE ----- spring 5.3.29 ----- springBoot版本2.6.17
-* tucache 1.0.3.RELEASE ----- spring 5.3.15 ----- springBoot版本2.6.3
-* tucache 1.0.2.RELEASE ----- spring 5.1.3.RELEASE ----- springBoot版本2.1.1.RELEASE
-* tucache 1.0.1.RELEASE ----- spring 5.1.3.RELEASE ----- springBoot版本2.1.1.RELEASE
 ### 个性化设置
 * tutu-cache默认提供了 RedisTuCacheService,如果用户使用的缓存是redis并配置了redisTemplate的bean则自动使用该默认缓存服务。
 * 用户使用其他缓存，则需要自定义TuCacheService，实现该接口并注入到TuCacheBean中
@@ -131,12 +125,12 @@ tutu-cache 是一个简单易用的Spring缓存注解。
     ```
 * springMVC中注入到TuCacheBean
     ```xml
-    <bean id="tuCacheProfiles" class="config.io.github.tri5m.tucache.core.TuCacheProfiles">
+    <bean id="tuCacheProfiles" class="io.github.tri5m.tucache.core.config.TuCacheProfiles">
         <property name="cachePrefix" value="test_tucache_prefixkey:" />
     </bean>
     ```
     ```xml
-    <bean id="tuCacheBean" class="aspect.io.github.tri5m.tucache.core.TuCacheAspect">
+    <bean id="tuCacheBean" class="io.github.tri5m.tucache.core.aspect.TuCacheAspect">
         <property name="tuCacheService" ref="redisCacheService" />
         <property name="tuCacheProfiles" ref="tuCacheProfiles" />
     </bean>
