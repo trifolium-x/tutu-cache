@@ -75,3 +75,4 @@ gen_code
 /tucache-core/target/
 /tucache-spring-boot-autoconfigure/target/
 /tucache-spring-boot-starter/target/
+/.xcodemap/
