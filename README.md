@@ -1,7 +1,7 @@
 ![tu-cache](https://socialify.git.ci/tri5m/tutu-cache/image?description=1&font=Inter&forks=1&issues=1&language=1&name=1&owner=1&pattern=Circuit%20Board&pulls=1&stargazers=1&theme=Light)
-tu-cache 是一个简单易用的Spring缓存注解。
+tutu-cache 是一个简单易用的Spring缓存注解。
 <br/>
-使用tu-cache注解来代替@Cacheable和@CacheEvict等注解
+使用tutu-cache注解来代替@Cacheable和@CacheEvict等注解
 
 [![GitHub license](https://img.shields.io/github/license/tri5m/tutu-cache)](https://github.com/tri5m/tutu-cache/blob/master/LICENSE)
 [![RELEASE](https://img.shields.io/badge/RELEASE-1.0.4.RELEASE-blue)](https://github.com/tri5m/tutu-cache/releases/tag/1.0.4.RELEASE)
