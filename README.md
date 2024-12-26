@@ -3,8 +3,8 @@ tutu-cache 是一个简单易用的Spring缓存注解。
 <br/>
 使用tutu-cache注解来代替@Cacheable和@CacheEvict等注解
 
-[![GitHub license](https://img.shields.io/github/license/trifolium-x/tutu-cache)](https://github.com/trifolium-x/tutu-cache/blob/master/LICENSE)
-[![RELEASE](https://img.shields.io/badge/RELEASE-1.0.4.RELEASE-blue)](https://github.com/trifolium-x/tutu-cache/releases/tag/1.0.4.RELEASE)
+[![GitHub license](https://img.shields.io/github/license/trifolium-x/tutu-cache)](https://github.com/tri5m/tutu-cache/blob/master/LICENSE)
+[![RELEASE](https://img.shields.io/badge/RELEASE-1.0.4.RELEASE-blue)](https://github.com/tri5m/tutu-cache/releases/tag/1.0.4.RELEASE)
 
 ### Version
 * 1.0.4.RELEASE
@@ -19,9 +19,9 @@ tutu-cache 是一个简单易用的Spring缓存注解。
       ```xml
       <dependencies>
         <dependency>
-            <groupId>co.tunan.tucache</groupId>
+            <groupId>io.github.tri5m</groupId>
             <artifactId>tucache-spring-boot-starter</artifactId>
-            <version>1.0.4.RELEASE</version>
+            <version>1.0.5.RELEASE</version>
         </dependency>
         <!-- 可选，建议使用redis,如有没redis依赖默认使用本地缓存 -->
         <dependency>
@@ -135,12 +135,12 @@ tutu-cache 是一个简单易用的Spring缓存注解。
     ```
 * springMVC中注入到TuCacheBean
     ```xml
-    <bean id="tuCacheProfiles" class="co.tunan.tucache.core.config.TuCacheProfiles">
+    <bean id="tuCacheProfiles" class="config.io.github.tri5m.tucache.core.TuCacheProfiles">
         <property name="cachePrefix" value="test_tucache_prefixkey:" />
     </bean>
     ```
     ```xml
-    <bean id="tuCacheBean" class="co.tunan.tucache.core.aspect.TuCacheAspect">
+    <bean id="tuCacheBean" class="aspect.io.github.tri5m.tucache.core.TuCacheAspect">
         <property name="tuCacheService" ref="redisCacheService" />
         <property name="tuCacheProfiles" ref="tuCacheProfiles" />
     </bean>

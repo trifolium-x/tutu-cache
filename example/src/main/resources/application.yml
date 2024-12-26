@@ -19,7 +19,7 @@ server:
 
 logging:
   level:
-    co.tunan.tucache: debug
+    io.github.tri5m.tucache: debug
 #  file:
 #    name: logs/log.log
 
