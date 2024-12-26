@@ -7,11 +7,7 @@ tutu-cache 是一个简单易用的Spring缓存注解。
 [![RELEASE](https://img.shields.io/badge/RELEASE-1.0.4.RELEASE-blue)](https://github.com/tri5m/tutu-cache/releases/tag/1.0.4.RELEASE)
 
 ### Version
-* 1.0.4.RELEASE
-* 1.0.3.RELEASE
-* 1.0.2.RELEASE
-* 1.0.1.RELEASE
-* 1.0.0
+* 1.0.5
 
 ### 🥳Quick Start
 1. 在springBoot中的使用
@@ -21,7 +17,7 @@ tutu-cache 是一个简单易用的Spring缓存注解。
         <dependency>
             <groupId>io.github.tri5m</groupId>
             <artifactId>tucache-spring-boot-starter</artifactId>
-            <version>1.0.5.RELEASE</version>
+            <version>1.0.5</version>
         </dependency>
         <!-- 可选，建议使用redis,如有没redis依赖默认使用本地缓存 -->
         <dependency>
