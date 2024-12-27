@@ -8,7 +8,7 @@ tutu-cache 是一个简单易用的Spring缓存注解。
 
 ### Version
 * 1.0.5
-
+* 注意1.0.5以前的版本，groupId为co.tunan.tucache。
 ### 🥳Quick Start
 1. 在springBoot中的使用
     * 引入jar依赖包
