@@ -7,7 +7,7 @@ tutu-cache 是一个简单易用的Spring缓存注解。
 [![RELEASE](https://img.shields.io/badge/RELEASE-1.0.4.RELEASE-blue)](https://github.com/tri5m/tutu-cache/releases/tag/1.0.4.RELEASE)
 
 ### Version
-* 1.0.5
+* 最新版本 1.0.5
 * 注意1.0.5以前的版本，groupId为co.tunan.tucache。
 ### 🥳Quick Start
 1. 在springBoot中的使用
