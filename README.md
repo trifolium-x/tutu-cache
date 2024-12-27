@@ -4,7 +4,7 @@ tutu-cache 是一个简单易用的Spring缓存注解。
 使用tutu-cache注解来代替@Cacheable和@CacheEvict等注解
 
 [![GitHub license](https://img.shields.io/github/license/tri5m/tutu-cache)](https://github.com/tri5m/tutu-cache/blob/master/LICENSE)
-[![RELEASE](https://img.shields.io/badge/RELEASE-1.0.4.RELEASE-blue)](https://github.com/tri5m/tutu-cache/releases/tag/1.0.4.RELEASE)
+[![RELEASE](https://img.shields.io/badge/RELEASE-1.0.5-blue)](https://github.com/tri5m/tutu-cache/releases/tag/v1.0.5)
 
 ### Version
 * 最新版本 1.0.5
