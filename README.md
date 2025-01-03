@@ -6,7 +6,7 @@ tutu-cache 是一个简单易用的Spring缓存注解。
 [![GitHub license](https://img.shields.io/github/license/tri5m/tutu-cache)](https://github.com/tri5m/tutu-cache/blob/master/LICENSE)
 [![RELEASE](https://img.shields.io/badge/RELEASE-1.0.5-blue)](https://github.com/tri5m/tutu-cache/releases/tag/v1.0.5)
 
-### Version
+### 🎉Version
 * 最新版本 1.0.5
 * 注意1.0.5以前的版本，groupId为co.tunan.tucache。
 * 几大亮点
@@ -34,7 +34,7 @@ tutu-cache 是一个简单易用的Spring缓存注解。
       </dependencies>
       ```
       
-### 使用tu-cache
+### 😊使用tu-cache
 1. 使用tu-cache对service中的方法返回的数据进行缓存
     ```java
     @TuCache("test_service:getList")
@@ -126,7 +126,7 @@ tutu-cache 是一个简单易用的Spring缓存注解。
         return redisTemplate;
     }
   ```
-### 个性化设置
+### 😋个性化设置
 * **springBoot中配置**
     ```yaml
     tucache:
