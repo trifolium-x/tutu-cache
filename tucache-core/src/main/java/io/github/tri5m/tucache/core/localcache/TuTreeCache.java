@@ -31,9 +31,7 @@ public class TuTreeCache {
     private final String DELIMITER;
 
     public TuTreeCache() {
-        this.DELIMITER = ":";
-        cacheTable = new CacheTable();
-        init();
+        this(":");
     }
 
     public TuTreeCache(String delimiter) {
@@ -51,19 +49,19 @@ public class TuTreeCache {
         // 递归扫描进行清理
         Thread scanRemove = new Thread(() -> {
             long sleepMillisSecond = 5000L;
-            for (; ; ) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
                     TimeUnit.MILLISECONDS.sleep(sleepMillisSecond);
                     // 递归扫描进行清理
+                    log.trace("tu_tree_cache clear expired cache data.");
                     scanRemove(cacheTable);
                 } catch (InterruptedException e) {
                     log.trace(e.getMessage(), e);
                     Thread.currentThread().interrupt();
-                    break;
                 }
             }
         });
-        scanRemove.setDaemon(false);
+        scanRemove.setDaemon(true);
         scanRemove.setName("tu_tree_cache-local-scan-clean");
         scanRemove.start();
     }
