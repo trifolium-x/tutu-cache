@@ -2,7 +2,6 @@ package io.github.tri5m.tucache.autoconfigure.configure.cache;
 
 import io.github.tri5m.tucache.autoconfigure.configure.TuCacheCondition;
 import io.github.tri5m.tucache.core.cache.TuCacheService;
-import io.github.tri5m.tucache.core.cache.impl.RedisCacheService;
 import io.github.tri5m.tucache.core.cache.impl.RedissonCacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;

@@ -35,6 +35,6 @@ public class TuCacheProfilesConfigure {
         AUTO,
         REDIS,
         REDISSON,
-        LOCAL;
+        LOCAL
     }
 }
