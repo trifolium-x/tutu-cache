@@ -5,20 +5,12 @@
     <parent>
         <groupId>io.github.tri5m</groupId>
         <artifactId>tucache</artifactId>
-        <version>1.0.5</version>
+        <version>1.0.6.rc1</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>tucache-core</artifactId>
-
-    <properties>
-        <spring.version>5.3.29</spring.version>
-        <spring.data.redis.version>2.7.15</spring.data.redis.version>
-        <slf4j.version>1.7.36</slf4j.version>
-        <junit.version>4.12</junit.version>
-        <aspectjweaver.versions>1.9.7</aspectjweaver.versions>
-    </properties>
 
     <packaging>jar</packaging>
 
@@ -47,6 +39,13 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
             <version>${spring.data.redis.version}</version>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>${redisson.version}</version>
             <optional>true</optional>
         </dependency>
 

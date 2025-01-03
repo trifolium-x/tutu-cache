@@ -5,15 +5,10 @@
     <parent>
         <groupId>io.github.tri5m</groupId>
         <artifactId>tucache</artifactId>
-        <version>1.0.5</version>
+        <version>1.0.6.rc1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>tucache-spring-boot-autoconfigure</artifactId>
-
-    <properties>
-        <spring.boot.version>2.7.15</spring.boot.version>
-        <slf4j.version>1.7.36</slf4j.version>
-    </properties>
 
     <dependencies>
 
@@ -41,6 +36,13 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
             <version>${spring.boot.version}</version>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>${redisson.version}</version>
             <optional>true</optional>
         </dependency>
 

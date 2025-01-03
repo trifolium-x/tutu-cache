@@ -24,7 +24,7 @@ public class TuCacheProfilesConfigure {
 
     /**
      * Specify the cache type, otherwise the cache component will be automatically inferred
-     * AUTO cache-type Priority => custom > redis > local
+     * AUTO cache-type Priority => custom > redis > redisson > local
      */
     private CacheType cacheType = CacheType.AUTO;
 
@@ -34,6 +34,7 @@ public class TuCacheProfilesConfigure {
     public enum CacheType {
         AUTO,
         REDIS,
+        REDISSON,
         LOCAL;
     }
 }

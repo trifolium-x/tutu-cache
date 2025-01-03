@@ -29,7 +29,7 @@
 
     <groupId>io.github.tri5m</groupId>
     <artifactId>tucache</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6.rc1</version>
     <modules>
         <module>tucache-core</module>
         <module>tucache-spring-boot-starter</module>
@@ -78,6 +78,14 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>8</java.version>
         <lombok.version>1.18.24</lombok.version>
+        <junit.version>4.12</junit.version>
+
+        <spring.boot.version>2.7.15</spring.boot.version>
+        <slf4j.version>1.7.36</slf4j.version>
+        <redisson.version>3.27.1</redisson.version>
+        <spring.version>5.3.29</spring.version>
+        <spring.data.redis.version>2.7.15</spring.data.redis.version>
+        <aspectjweaver.versions>1.9.7</aspectjweaver.versions>
     </properties>
 
     <dependencies>

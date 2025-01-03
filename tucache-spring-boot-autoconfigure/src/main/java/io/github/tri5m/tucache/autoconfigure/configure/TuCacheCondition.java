@@ -2,6 +2,7 @@ package io.github.tri5m.tucache.autoconfigure.configure;
 
 import io.github.tri5m.tucache.autoconfigure.configure.cache.LocalCacheServiceConfigure;
 import io.github.tri5m.tucache.autoconfigure.configure.cache.RedisCacheServiceConfigure;
+import io.github.tri5m.tucache.autoconfigure.configure.cache.RedissonCacheServiceConfigure;
 import org.springframework.boot.autoconfigure.condition.ConditionMessage;
 import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
@@ -58,6 +59,11 @@ public class TuCacheCondition extends SpringBootCondition {
         switch (cacheType) {
             case REDIS:
                 if (RedisCacheServiceConfigure.class.getName().equals(sourceClass)) {
+                    outcome = ConditionOutcome.match(msg);
+                }
+                break;
+            case REDISSON:
+                if (RedissonCacheServiceConfigure.class.getName().equals(sourceClass)) {
                     outcome = ConditionOutcome.match(msg);
                 }
                 break;

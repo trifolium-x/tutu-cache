@@ -9,6 +9,13 @@ tutu-cache 是一个简单易用的Spring缓存注解。
 ### Version
 * 最新版本 1.0.5
 * 注意1.0.5以前的版本，groupId为co.tunan.tucache。
+* 几大亮点
+  1. 支持模糊删除缓存
+  2. 支持spEl表达式
+  3. 支持自定义缓存服务
+  4. 支持本地缓存
+  5. 配置简单，使用方便
+  
 ### 🥳Quick Start
 1. 在springBoot中的使用
     * 引入jar依赖包
@@ -26,6 +33,7 @@ tutu-cache 是一个简单易用的Spring缓存注解。
         </dependency>
       </dependencies>
       ```
+      
 ### 使用tu-cache
 1. 使用tu-cache对service中的方法返回的数据进行缓存
     ```java
@@ -42,7 +50,7 @@ tutu-cache 是一个简单易用的Spring缓存注解。
     ```
 3. @TuCache参数
     * `String key() default ""` 缓存的字符串格式key,支持spEl表达式(使用#{}包裹spEl表达式)，默认值为方法签名
-    * `long expire() default -1` 缓存的过期时间，单位(秒),默认永不过期. (**在1.0.4.RELEASE以上版本中建议使用 `timeout`**)
+    * `long timeout() default -1` 缓存的过期时间，单位(秒),默认永不过期. (在1.0.4.RELEASE以前版本中使用 `expire`)
     * `boolean resetExpire() default false` 每次获取数据是否重置过期时间.
     * `TimeUnit timeUnit() default TimeUnit.SECONDS` 缓存的时间单位.
     * `String condition() default "true"` 扩展的条件过滤，值为spEl表达式(直接编写表达式不需要使用#{}方式声明为spEl)
@@ -86,7 +94,12 @@ tutu-cache 是一个简单易用的Spring缓存注解。
         public void deleteItem(Long id){
         }
         
-        // 如果需要调用本地的方法
+        // 模糊删除 test_service:itemList:开头的所有key
+        @TuCacheClear(keys={"test_service:itemList:"}, async = true)
+        public void deleteItem(Long id){
+        }
+      
+        // 支持spEl表达式
         @TuCacheClear(keys={"test_service:itemList:","test_service:itemDetail:#{#id}"}, async = true)
         public void deleteItem(Long id){
         }
@@ -97,48 +110,10 @@ tutu-cache 是一个简单易用的Spring缓存注解。
       * condition = "#param.startsWith('a')"
       * condition = "false"
 
-* 建议自定义序列化在Configure类中注册javaBean redisTemplate或者使用默认的redisTemplate，必须开启aspectj的aop功能(默认是开启的)
+* 如果使用redisTemplate, 建议自定义序列化在Configure类中注册javaBean redisTemplate或者使用默认的redisTemplate，必须开启aspectj的aop功能(默认是开启的)
   ```java
+  // 建议的redisTemplate序列化配置， 强烈建议使用对key使用String方式序列化
   @Bean(name = "redisTemplate")
-  public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-  RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-  redisTemplate.setKeySerializer(new StringRedisSerializer());
-  redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-  redisTemplate.setConnectionFactory(redisConnectionFactory);
-
-            return redisTemplate;
-      }
-      ```
-### 个性化设置
-* tutu-cache默认提供了 RedisTuCacheService,如果用户使用的缓存是redis并配置了redisTemplate的bean则自动使用该默认缓存服务。
-* 用户使用其他缓存，则需要自定义TuCacheService，实现该接口并注入到TuCacheBean中
-* 在SpringBoot中在Configure类中配置相应的bean自动使用自定义的bean
-* 如果用户需要每个缓存前面添加同意的keyPrefix，TuCacheBean的prefixKey参数
-* springBoot中配置
-    ```yaml
-    tucache:
-      enabled: true
-      cache-type: redis
-      profiles:
-        cache-prefix: "my_tu_key_test:"
-        # ...
-    ```
-* springMVC中注入到TuCacheBean
-    ```xml
-    <bean id="tuCacheProfiles" class="io.github.tri5m.tucache.core.config.TuCacheProfiles">
-        <property name="cachePrefix" value="test_tucache_prefixkey:" />
-    </bean>
-    ```
-    ```xml
-    <bean id="tuCacheBean" class="io.github.tri5m.tucache.core.aspect.TuCacheAspect">
-        <property name="tuCacheService" ref="redisCacheService" />
-        <property name="tuCacheProfiles" ref="tuCacheProfiles" />
-    </bean>
-    ```
-* 关于默认RedisTuCacheService的序列化问题，强烈建议使用对key使用String方式序列化
-* 使用Json序列化配置样例如下:
-    ```java
-    @Bean(name = "redisTemplate")
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setKeySerializer(new StringRedisSerializer());
@@ -150,8 +125,35 @@ tutu-cache 是一个简单易用的Spring缓存注解。
     
         return redisTemplate;
     }
+  ```
+### 个性化设置
+* **springBoot中配置**
+    ```yaml
+    tucache:
+      enabled: true
+      cache-type: redis
+      profiles:
+        cache-prefix: "my_tu_key_test:"
+        # ...
     ```
+* 如果用户需要每个缓存前面添加同意的keyPrefix，TuCacheBean的prefixKey参数
+* 如果不指定cache-type，则会自动推断使用的缓存工具，优先级为 custom > redis > redisson > local
+* tutu-cache默认提供了一下缓存服务
+  1. `RedisTuCacheService`
+  2. `RedissonTuCacheService`
+  3. `LocalTuCacheService`
+  4. 优先级从前往后
   
+* 用户使用其他缓存，则需要自定义`TuCacheService`，并配置为spring bean
+    ```java
+     // 自定义缓存服务
+     @Primary
+     @Bean
+     public TuCacheService myCustomCacheService(){
+         return new MyCustomCacheService();
+     }
+    ```
+
 #### 作者QQ 交流群: 76131683
 #### 希望更多的开发者参与
 ☕️[请我喝一杯咖啡]
